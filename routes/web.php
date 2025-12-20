@@ -1,0 +1,100 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryAdminController;
+use App\Http\Controllers\Admin\SubCategoryAdminController;
+use App\Http\Controllers\Admin\DeliveryAdminController;
+use App\Http\Controllers\Admin\VendorAdminController;
+use App\Http\Controllers\Admin\ProductAdminController;
+use App\Http\Controllers\Admin\UserAdminController;
+use App\Http\Controllers\Admin\OrderAdminController;
+use App\Http\Controllers\Admin\CouponAdminController;
+use App\Http\Controllers\Admin\ContentAdminController;
+use App\Http\Controllers\Admin\PaymentAdminController;
+use App\Http\Controllers\Admin\SmtpAdminController;
+use App\Http\Controllers\Admin\InvoiceAdminController;
+use App\Http\Controllers\Admin\SeoAdminController;
+use App\Http\Controllers\Admin\SettingAdminController;
+use App\Http\Controllers\Admin\ApiDocsController;
+use App\Http\Controllers\Admin\DownloadAdminController;
+
+// Route::get('/', fn() => redirect()->route('admin.dashboard'));
+// Secure download routes (signed)
+Route::middleware('auth','role:Admin')->get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::get('/admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
+Route::post('/admin/logout', [AdminAuthController::class, 'destroy'])->middleware('auth')->name('admin.logout');
+
+Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('locale', function () {
+        return redirect('/');
+    })->name('locale.show');
+
+    Route::post('locale', function (Request $request) {
+        $data = $request->validate([
+            'locale' => ['required', 'in:en,bn'],
+        ]);
+
+        $locale = $data['locale'];
+        $request->session()->put('locale', $locale);
+
+        $redirectTo = url()->previous() ?: '/';
+        if ($redirectTo === url('/admin/locale')) {
+            $redirectTo = '/';
+        }
+
+        return redirect()->to($redirectTo)->withCookie(cookie('locale', $locale, 60 * 24 * 365));
+    })->name('locale');
+    // Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::resource('categories', CategoryAdminController::class);
+    Route::resource('subcategories', SubCategoryAdminController::class);
+    Route::get('deliveries', [DeliveryAdminController::class, 'index'])->name('deliveries.index');
+    Route::post('deliveries/types', [DeliveryAdminController::class, 'storeType'])->name('deliveries.types.store');
+    Route::post('deliveries/fields', [DeliveryAdminController::class, 'storeField'])->name('deliveries.fields.store');
+    Route::delete('deliveries/fields/{deliveryField}', [DeliveryAdminController::class, 'destroyField'])->name('deliveries.fields.destroy');
+
+    Route::get('vendors', [VendorAdminController::class, 'index'])->name('vendors.index');
+    Route::put('vendors/{user}', [VendorAdminController::class, 'update'])->name('vendors.update');
+    Route::post('vendors/{user}/ban', [VendorAdminController::class, 'ban'])->name('vendors.ban');
+    Route::post('vendors/{user}/unban', [VendorAdminController::class, 'unban'])->name('vendors.unban');
+
+    Route::resource('products', ProductAdminController::class);
+    Route::resource('users', UserAdminController::class);
+    Route::resource('orders', OrderAdminController::class)->only(['index','show']);
+    Route::post('orders/{order}/deliveries/upload', [OrderAdminController::class, 'uploadDeliveryFile'])->name('orders.deliveries.upload');
+
+    Route::resource('coupons', CouponAdminController::class);
+
+    Route::get('content', [ContentAdminController::class, 'index'])->name('content.index');
+    Route::post('content/pages', [ContentAdminController::class, 'savePages'])->name('content.pages.save');
+    Route::post('content/faqs', [ContentAdminController::class, 'saveFaqs'])->name('content.faqs.save');
+
+    Route::get('payments/uddoktapay', [PaymentAdminController::class, 'edit'])->name('payments.uddoktapay.edit');
+    Route::post('payments/uddoktapay', [PaymentAdminController::class, 'update'])->name('payments.uddoktapay.update');
+
+    Route::get('smtp', [SmtpAdminController::class, 'edit'])->name('smtp.edit');
+    Route::post('smtp', [SmtpAdminController::class, 'update'])->name('smtp.update');
+
+    Route::get('invoice-template', [InvoiceAdminController::class, 'edit'])->name('invoice.edit');
+    Route::post('invoice-template', [InvoiceAdminController::class, 'update'])->name('invoice.update');
+
+    Route::get('seo', [SeoAdminController::class, 'edit'])->name('seo.edit');
+    Route::post('seo', [SeoAdminController::class, 'update'])->name('seo.update');
+
+    Route::get('settings', [SettingAdminController::class, 'edit'])->name('settings.edit');
+    Route::post('settings', [SettingAdminController::class, 'update'])->name('settings.update');
+
+    Route::get('api-docs', [ApiDocsController::class, 'index'])->name('api-docs');
+});
+
+// Secure download routes (signed)
+Route::middleware('auth')->get('/downloads/{token}', 
+
+
+[DownloadAdminController::class, 'download'])
+    ->name('downloads.get')->middleware('signed');
