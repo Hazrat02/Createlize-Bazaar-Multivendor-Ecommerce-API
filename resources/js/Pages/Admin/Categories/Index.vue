@@ -4,14 +4,14 @@
       <div class="row align-items-center">
         <div class="col-md-6">
           <div class="title mb-30">
-            <h2>Categories</h2>
-            <p class="text-sm text-muted">Manage categories</p>
+            <h2>{{ t('categories_title') }}</h2>
+            <p class="text-sm text-muted">{{ t('manage_categories') }}</p>
           </div>
         </div>
         <div class="col-md-6">
           <div class="text-end mb-30">
             <Link href="/admin/categories/create" class="main-btn primary-btn btn-hover">
-              + Add Category
+              + {{ t('add_category') }}
             </Link>
           </div>
         </div>
@@ -21,7 +21,7 @@
     <div class="card-style mb-30">
       <div class="title d-flex flex-wrap justify-content-between align-items-center">
         <div class="left">
-          <h6 class="text-medium mb-30">Categories</h6>
+          <h6 class="text-medium mb-30">{{ t('categories_title') }}</h6>
         </div>
         <div class="right">
           <div class="select-style-1">
@@ -30,7 +30,7 @@
                 v-model="q"
                 type="text"
                 class="light-bg form-control"
-                placeholder="Search category name..."
+                :placeholder="t('search_category_placeholder')"
                 aria-label="Search categories"
               />
            
@@ -38,7 +38,7 @@
         </div>
       </div>
       <div v-if="q" class="text-end mb-3">
-        <button class="main-btn danger-btn-outline btn-hover btn-sm" @click="clearSearch">Clear</button>
+        <button class="main-btn danger-btn-outline btn-hover btn-sm" @click="clearSearch">{{ t('clear') }}</button>
       </div>
 
       <div class="table-responsive">
@@ -46,11 +46,11 @@
             <thead>
               <tr>
                 <th style="width: 80px;">#</th>
-                <th>Name</th>
-                <th>Slug</th>
-                <th class="min-width">Status</th>
-                <th class="min-width">Active</th>
-                <th style="" class="text-end">Actions</th>
+                <th>{{ t('name') }}</th>
+                <th>{{ t('slug') }}</th>
+                <th class="min-width">{{ t('status') }}</th>
+                <th class="min-width">{{ t('active') }}</th>
+                <th style="" class="text-end">{{ t('actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -59,9 +59,9 @@
                 <td class="fw-semibold">{{ cat.name }}</td>
                 <td class="text-muted">{{ cat.slug }}</td>
                 <td>
-                  <span class="status-btn" :class="cat.is_active ? 'success-btn' : 'close-btn'">
-                    {{ cat.is_active ? 'Active' : 'Inactive' }}
-                  </span>
+                    <span class="status-btn" :class="cat.is_active ? 'success-btn' : 'close-btn'">
+                      {{ cat.is_active ? t('active') : t('inactive') }}
+                    </span>
                 </td>
                 <td>
                   <div class="form-check form-switch">
@@ -86,11 +86,11 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" :class="{ show: openMenuId === cat.id }">
                       <li class="dropdown-item">
-                        <Link :href="`/admin/categories/${cat.id}/edit`" class="text-gray">Edit</Link>
+                        <Link :href="`/admin/categories/${cat.id}/edit`" class="text-gray">{{ t('edit') }}</Link>
                       </li>
                       <li class="dropdown-item">
                         <a type="button" class="text-gray bg-transparent border-0 p-0" @click="destroy(cat)">
-                          Remove
+                          {{ t('remove') }}
                         </a>
                       </li>
                     </ul>
@@ -98,7 +98,7 @@
                 </td>
               </tr>
               <tr v-if="!categories.data.length">
-                <td colspan="6" class="text-center text-muted py-4">No categories found.</td>
+                <td colspan="6" class="text-center text-muted py-4">{{ t('no_categories_found') }}</td>
               </tr>
             </tbody>
           </table>
@@ -112,13 +112,20 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
-import { Link, router } from '@inertiajs/vue3'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { Link, router, usePage } from '@inertiajs/vue3'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const props = defineProps({
   categories: { type: Object, required: true },
   filters: { type: Object, default: () => ({}) },
 })
+
+const page = usePage()
+const messages = computed(() => page.props.i18n?.admin || {})
+
+function t(key) {
+  return messages.value[key] || key
+}
 
 const q = ref(props.filters?.q || '')
 let searchTimer = null
@@ -134,7 +141,7 @@ function clearSearch() {
 }
 
 function destroy(cat) {
-  if (!confirm(`Delete category "${cat.name}"? This cannot be undone.`)) return
+  if (!confirm(`${t('confirm_delete_category')} "${cat.name}"?`)) return
   router.delete(`/admin/categories/${cat.id}`, { preserveScroll: true })
 }
 

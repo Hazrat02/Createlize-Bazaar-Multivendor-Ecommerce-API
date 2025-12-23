@@ -21,7 +21,9 @@ class UddoktaPayService
 
     public function apiKey(): string
     {
-        return (string)$this->settings->get('payment_uddoktapay', 'api_key', '');
+        $mode = $this->settings->get('payment_uddoktapay', 'mode', 'sandbox');
+        $key = $mode === 'live' ? 'live_api_key' : 'sandbox_api_key';
+        return (string)$this->settings->get('payment_uddoktapay', $key, '');
     }
 
     public function createCharge(array $payload): array

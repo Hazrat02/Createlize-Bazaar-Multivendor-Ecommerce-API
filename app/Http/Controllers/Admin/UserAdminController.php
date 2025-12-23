@@ -3,19 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class UserAdminController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $query = User::query()->with('roles')->latest();
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
         return Inertia::render('Admin/Users/Index', [
-            'users' => User::query()->latest()->paginate(20),
+            'users' => $query->paginate(20)->withQueryString(),
+            'filters' => $request->only('q'),
         ]);
     }
 
@@ -48,8 +61,31 @@ class UserAdminController extends Controller
     public function edit(User $user): Response
     {
         return Inertia::render('Admin/Users/Edit', [
-            'user' => $user,
+            'user' => $user->load('roles'),
             'roles' => $user->getRoleNames(),
+        ]);
+    }
+
+    public function show(User $user): Response
+    {
+        $user->load(['roles','vendorProfile']);
+
+        $orders = Order::query()
+            ->where('customer_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $payments = Order::query()
+            ->where('customer_id', $user->id)
+            ->latest()
+            ->limit(10)
+            ->get(['id','order_number','total','payment_status','payment_method','created_at']);
+
+        return Inertia::render('Admin/Users/Show', [
+            'user' => $user,
+            'orders' => $orders,
+            'payments' => $payments,
         ]);
     }
 
@@ -79,5 +115,62 @@ class UserAdminController extends Controller
     {
         $user->delete();
         return redirect()->route('admin.users.index')->with('success','User deleted');
+    }
+
+    public function ban(User $user): RedirectResponse
+    {
+        $user->update(['status' => 'banned']);
+        return back()->with('success','User banned');
+    }
+
+    public function unban(User $user): RedirectResponse
+    {
+        $user->update(['status' => 'active']);
+        return back()->with('success','User unbanned');
+    }
+
+    public function sendMail(Request $request, User $user): RedirectResponse
+    {
+        $data = $request->validate([
+            'subject' => ['required','string','max:150'],
+            'message' => ['required','string'],
+        ]);
+
+        $smtp = Setting::query()->where('key', 'smtp')->first()?->value;
+        if (!$smtp) {
+            return back()->with('error', 'SMTP settings not configured.');
+        }
+
+        config()->set('mail.default', $smtp['mailer'] ?? 'smtp');
+        config()->set('mail.mailers.smtp.host', $smtp['host'] ?? '');
+        config()->set('mail.mailers.smtp.port', $smtp['port'] ?? 587);
+        config()->set('mail.mailers.smtp.username', $smtp['username'] ?? null);
+        config()->set('mail.mailers.smtp.password', $smtp['password'] ?? null);
+        config()->set('mail.mailers.smtp.encryption', $smtp['encryption'] ?? null);
+        config()->set('mail.from.address', $smtp['from_address'] ?? 'no-reply@example.com');
+        config()->set('mail.from.name', $smtp['from_name'] ?? 'Admin');
+
+        $templateSubject = $smtp['template_subject'] ?? null;
+        $templateBody = $smtp['template_body'] ?? null;
+
+        $subject = $templateSubject ?: $data['subject'];
+        $body = $templateBody ?: nl2br(e($data['message']));
+
+        $replace = [
+            '{{name}}' => $user->name,
+            '{{email}}' => $user->email,
+            '{{subject}}' => $data['subject'],
+            '{{message}}' => nl2br(e($data['message'])),
+        ];
+        $subject = strtr($subject, $replace);
+        $body = strtr($body, $replace);
+
+        Mail::send([], [], function ($mail) use ($subject, $body, $user) {
+            $mail->to($user->email)
+                ->subject($subject)
+                ->html($body);
+        });
+
+        return back()->with('success', 'Email sent');
     }
 }

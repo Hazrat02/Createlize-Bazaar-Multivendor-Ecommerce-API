@@ -54,19 +54,35 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('categories', CategoryAdminController::class);
     Route::resource('subcategories', SubCategoryAdminController::class);
     Route::get('deliveries', [DeliveryAdminController::class, 'index'])->name('deliveries.index');
+    Route::get('deliveries/create', [DeliveryAdminController::class, 'create'])->name('deliveries.create');
+    Route::post('deliveries', [DeliveryAdminController::class, 'store'])->name('deliveries.store');
+    Route::get('deliveries/{deliveryType}/edit', [DeliveryAdminController::class, 'edit'])->name('deliveries.edit');
+    Route::put('deliveries/{deliveryType}', [DeliveryAdminController::class, 'update'])->name('deliveries.update');
+    Route::delete('deliveries/{deliveryType}', [DeliveryAdminController::class, 'destroy'])->name('deliveries.destroy');
+    Route::get('deliveries/{deliveryType}/fields', [DeliveryAdminController::class, 'fields'])->name('deliveries.fields.index');
+    Route::get('deliveries/{deliveryType}/fields/create', [DeliveryAdminController::class, 'createField'])->name('deliveries.fields.create');
     Route::post('deliveries/types', [DeliveryAdminController::class, 'storeType'])->name('deliveries.types.store');
     Route::post('deliveries/fields', [DeliveryAdminController::class, 'storeField'])->name('deliveries.fields.store');
     Route::delete('deliveries/fields/{deliveryField}', [DeliveryAdminController::class, 'destroyField'])->name('deliveries.fields.destroy');
 
     Route::get('vendors', [VendorAdminController::class, 'index'])->name('vendors.index');
+    Route::post('vendors', [VendorAdminController::class, 'store'])->name('vendors.store');
+    Route::get('vendors/{user}', [VendorAdminController::class, 'show'])->name('vendors.show');
+    Route::get('vendors/{user}/edit', [VendorAdminController::class, 'edit'])->name('vendors.edit');
     Route::put('vendors/{user}', [VendorAdminController::class, 'update'])->name('vendors.update');
+    Route::put('vendors/{user}/profile', [VendorAdminController::class, 'updateProfile'])->name('vendors.profile.update');
+    Route::delete('vendors/{user}/profile', [VendorAdminController::class, 'destroyProfile'])->name('vendors.profile.destroy');
     Route::post('vendors/{user}/ban', [VendorAdminController::class, 'ban'])->name('vendors.ban');
     Route::post('vendors/{user}/unban', [VendorAdminController::class, 'unban'])->name('vendors.unban');
 
     Route::resource('products', ProductAdminController::class);
     Route::resource('users', UserAdminController::class);
-    Route::resource('orders', OrderAdminController::class)->only(['index','show']);
+    Route::post('users/{user}/ban', [UserAdminController::class, 'ban'])->name('users.ban');
+    Route::post('users/{user}/unban', [UserAdminController::class, 'unban'])->name('users.unban');
+    Route::post('users/{user}/mail', [UserAdminController::class, 'sendMail'])->name('users.mail');
+    Route::resource('orders', OrderAdminController::class)->only(['index','show','update']);
     Route::post('orders/{order}/deliveries/upload', [OrderAdminController::class, 'uploadDeliveryFile'])->name('orders.deliveries.upload');
+    Route::get('orders/{order}/invoice', [OrderAdminController::class, 'invoice'])->name('orders.invoice');
 
     Route::resource('coupons', CouponAdminController::class);
 

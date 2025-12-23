@@ -91,9 +91,9 @@
                       <Link :href="`/admin/subcategories/${sub.id}/edit`" class="text-gray">{{ t('edit') }}</Link>
                     </li>
                     <li class="dropdown-item">
-                      <button type="button" class="text-gray bg-transparent border-0 p-0" @click="destroy(sub)">
+                      <a type="button" class="text-gray bg-transparent border-0 p-0" @click="destroy(sub)">
                         {{ t('remove') }}
-                      </button>
+                      </a>
                     </li>
                   </ul>
                 </div>

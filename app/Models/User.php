@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->hasOne(VendorProfile::class, 'user_id');
     }
 
+    public function vendorTransactions()
+    {
+        return $this->hasManyThrough(VendorTransaction::class, VendorProfile::class, 'user_id', 'vendor_profile_id');
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class, 'vendor_id');

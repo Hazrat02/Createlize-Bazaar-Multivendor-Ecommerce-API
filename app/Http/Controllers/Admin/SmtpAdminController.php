@@ -30,6 +30,8 @@ class SmtpAdminController extends Controller
             'encryption' => ['nullable','string'],
             'from_address' => ['required','email'],
             'from_name' => ['required','string'],
+            'template_subject' => ['nullable','string','max:150'],
+            'template_body' => ['nullable','string'],
         ]);
 
         Setting::query()->updateOrCreate(

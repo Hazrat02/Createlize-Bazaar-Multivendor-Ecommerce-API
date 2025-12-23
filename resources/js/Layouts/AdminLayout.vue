@@ -144,12 +144,12 @@
       </nav>
       <div class="promo-box">
         <div class="promo-icon">
-          <img class="mx-auto" src="@/../admin/assets/images/logo/logo-icon-big.svg" alt="Logo" />
+          <img class="mx-auto" style="width: 80px;" src="@/../admin/assets/images/createlize.png" alt="Logo" />
         </div>
-        <h3>Upgrade to PRO</h3>
-        <p>Improve your development process and start doing more with PlainAdmin PRO!</p>
-        <a href="https://plainadmin.com/pro" target="_blank" rel="nofollow" class="main-btn primary-btn btn-hover">
-          Upgrade to PRO
+        <h3>Contact With Dev</h3>
+        <p>Improve your development process and start doing more with Createlize</p>
+        <a href="https://cretelize.org" target="_blank" rel="nofollow" class="main-btn primary-btn btn-hover">
+          Createlize
         </a>
       </div>
     </aside>
@@ -178,28 +178,57 @@
                   <button class="dropdown-toggle bg-transparent border-0" type="button" @click="languageOpen = !languageOpen">
                     <div class="profile-info">
                       <div class="info">
-                        <h6 class="mb-0">{{ localeLabel }}</h6>
+                        <h6 class="mb-0">
+                          <a v-if="locale === 'bn'" class="language-label">
+                            <svg class="flag-icon" viewBox="0 0 60 30" aria-hidden="true">
+                              <rect width="60" height="30" fill="#006A4E" />
+                              <circle cx="26" cy="15" r="9" fill="#F42A41" />
+                            </svg>
+                             বাংলা
+                          </a>
+                          <a v-else class="language-label">
+                            <svg class="flag-icon" viewBox="0 0 60 30" aria-hidden="true">
+                              <rect width="60" height="30" fill="#012169" />
+                              <polygon points="0,0 7,0 60,26 60,30 53,30 0,4" fill="#FFFFFF" />
+                              <polygon points="60,0 53,0 0,26 0,30 7,30 60,4" fill="#FFFFFF" />
+                              <polygon points="0,0 4,0 60,24 60,30 56,30 0,6" fill="#C8102E" />
+                              <polygon points="60,0 56,0 0,24 0,30 4,30 60,6" fill="#C8102E" />
+                              <rect x="25" width="10" height="30" fill="#FFFFFF" />
+                              <rect y="10" width="60" height="10" fill="#FFFFFF" />
+                              <rect x="27" width="6" height="30" fill="#C8102E" />
+                              <rect y="12" width="60" height="6" fill="#C8102E" />
+                            </svg>
+                             English
+                          </a>
+                        </h6>
                       </div>
                     </div>
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end" :class="{ show: languageOpen }">
                     <li>
-                      <form method="POST" action="/admin/locale">
-                        <input type="hidden" name="_token" :value="csrf" />
-                        <input type="hidden" name="locale" value="en" />
-                        <button type="submit" class="dropdown-item" :class="{ active: locale === 'en' }">
-                          🇬🇧 English
-                        </button>
-                      </form>
+                      <a type="button" class="dropdown-item" :class="{ active: locale === 'en' }" @click="setLocale('en')">
+                        <svg class="flag-icon" viewBox="0 0 60 30" aria-hidden="true">
+                          <rect width="60" height="30" fill="#012169" />
+                          <polygon points="0,0 7,0 60,26 60,30 53,30 0,4" fill="#FFFFFF" />
+                          <polygon points="60,0 53,0 0,26 0,30 7,30 60,4" fill="#FFFFFF" />
+                          <polygon points="0,0 4,0 60,24 60,30 56,30 0,6" fill="#C8102E" />
+                          <polygon points="60,0 56,0 0,24 0,30 4,30 60,6" fill="#C8102E" />
+                          <rect x="25" width="10" height="30" fill="#FFFFFF" />
+                          <rect y="10" width="60" height="10" fill="#FFFFFF" />
+                          <rect x="27" width="6" height="30" fill="#C8102E" />
+                          <rect y="12" width="60" height="6" fill="#C8102E" />
+                        </svg>
+                        English
+                      </a>
                     </li>
                     <li>
-                      <form method="POST" action="/admin/locale">
-                        <input type="hidden" name="_token" :value="csrf" />
-                        <input type="hidden" name="locale" value="bn" />
-                        <button type="submit" class="dropdown-item" :class="{ active: locale === 'bn' }">
-                          🇧🇩 বাংলা
-                        </button>
-                      </form>
+                      <a type="button" class="dropdown-item" :class="{ active: locale === 'bn' }" @click="setLocale('bn')">
+                        <svg class="flag-icon" viewBox="0 0 60 30" aria-hidden="true">
+                          <rect width="60" height="30" fill="#006A4E" />
+                          <circle cx="26" cy="15" r="9" fill="#F42A41" />
+                        </svg>
+                        বাংলা
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -241,7 +270,7 @@
                     <li>
                       <form method="POST" action="/admin/logout">
                         <input type="hidden" name="_token" :value="csrf" />
-                        <button type="submit" class="dropdown-item">
+                        <button type="submit"  class="logout">
                           <i class="lni lni-exit"></i> {{ t('sign_out') }}
                         </button>
                       </form>
@@ -294,7 +323,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
-import { Link, usePage } from '@inertiajs/vue3'
+import { Link, router, usePage } from '@inertiajs/vue3'
 
 const page = usePage()
 const user = computed(() => page.props.auth?.user)
@@ -331,7 +360,9 @@ function t(key) {
   return messages.value[key] || key
 }
 
-const localeLabel = computed(() => (locale.value === 'bn' ? 'বাংলা' : 'English'))
+function setLocale(value) {
+  router.post('/admin/locale', { locale: value }, { preserveScroll: true, onFinish: () => (languageOpen.value = false) })
+}
 
 onMounted(() => {
   preloaderVisible.value = false
@@ -348,8 +379,29 @@ watch(
 </script>
 
 <style scoped>
+.flag-icon {
+  width: 18px;
+  height: 16px;
+  display: inline-block;
+}
+
+.language-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* .active {
   color: #1A2142;
   background: rgba(223, 229, 239, 0.3);
 } */
+
+ .logout{
+  background: none !important;
+  
+ }
 </style>
+
+
+
+

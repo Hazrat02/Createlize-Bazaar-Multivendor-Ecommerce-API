@@ -7,33 +7,88 @@ use App\Models\DeliveryField;
 use App\Models\DeliveryType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DeliveryAdminController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $query = DeliveryType::query()->orderBy('sort_order')->orderBy('name');
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', "%{$search}%")
+                    ->orWhere('key', 'like', "%{$search}%");
+            });
+        }
+
         return Inertia::render('Admin/Deliveries/Index', [
-            'deliveryTypes' => DeliveryType::query()->with('fields')->orderBy('sort_order')->get(),
+            'deliveryTypes' => $query->paginate(10)->withQueryString(),
+            'filters' => $request->only('q'),
         ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('Admin/Deliveries/Create');
+    }
+
+    public function edit(DeliveryType $deliveryType): Response
+    {
+        return Inertia::render('Admin/Deliveries/Edit', [
+            'deliveryType' => $deliveryType,
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        return $this->saveType($request);
     }
 
     public function storeType(Request $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:150'],
-            'code' => ['required','string','max:50','unique:delivery_types,code'],
-            'sort_order' => ['nullable','integer','min:0'],
-        ]);
+        return $this->saveType($request);
+    }
 
-        DeliveryType::create([
-            'name' => $data['name'],
-            'code' => $data['code'],
-            'sort_order' => $data['sort_order'] ?? 0,
-        ]);
+    public function update(Request $request, DeliveryType $deliveryType): RedirectResponse
+    {
+        return $this->saveType($request, $deliveryType);
+    }
 
-        return back()->with('success','Delivery type created');
+    public function destroy(DeliveryType $deliveryType): RedirectResponse
+    {
+        $deliveryType->delete();
+
+        return back()->with('success', 'Delivery type deleted');
+    }
+
+    public function fields(DeliveryType $deliveryType, Request $request): Response
+    {
+        $fieldsQuery = $deliveryType->fields()->orderBy('sort_order')->orderBy('title');
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $fieldsQuery->where(function ($builder) use ($search) {
+                $builder->where('title', 'like', "%{$search}%")
+                    ->orWhere('name', 'like', "%{$search}%");
+            });
+        }
+
+        return Inertia::render('Admin/Deliveries/Fields', [
+            'deliveryType' => $deliveryType,
+            'fields' => $fieldsQuery->paginate(10)->withQueryString(),
+            'filters' => $request->only('q'),
+        ]);
+    }
+
+    public function createField(DeliveryType $deliveryType): Response
+    {
+        return Inertia::render('Admin/Deliveries/CreateFields', [
+            'deliveryType' => $deliveryType,
+        ]);
     }
 
     public function storeField(Request $request): RedirectResponse
@@ -60,12 +115,55 @@ class DeliveryAdminController extends Controller
             'sort_order' => $data['sort_order'] ?? 0,
         ]);
 
-        return back()->with('success','Field created');
+        $deliveryType = DeliveryType::find($data['delivery_type_id']);
+
+        if (!$deliveryType) {
+            return back()->with('success', 'Field created');
+        }
+
+        return redirect()
+            ->route('admin.deliveries.fields.index', $deliveryType)
+            ->with('success', 'Field created');
     }
 
     public function destroyField(DeliveryField $deliveryField): RedirectResponse
     {
         $deliveryField->delete();
-        return back()->with('success','Field deleted');
+        return back()->with('success', 'Field deleted');
+    }
+
+    private function saveType(Request $request, ?DeliveryType $deliveryType = null): RedirectResponse
+    {
+        $uniqueRule = Rule::unique('delivery_types', 'key');
+        if ($deliveryType) {
+            $uniqueRule = $uniqueRule->ignore($deliveryType->id);
+        }
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'key' => ['required', 'string', 'max:50', $uniqueRule],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+
+        if ($deliveryType) {
+            $deliveryType->update([
+                'name' => $data['name'],
+                'key' => $data['key'],
+                'sort_order' => $data['sort_order'] ?? 0,
+                'is_active' => (bool)($data['is_active'] ?? false),
+            ]);
+
+            return redirect()->route('admin.deliveries.index')->with('success', 'Delivery type updated');
+        }
+
+        DeliveryType::create([
+            'name' => $data['name'],
+            'key' => $data['key'],
+            'sort_order' => $data['sort_order'] ?? 0,
+            'is_active' => (bool)($data['is_active'] ?? false),
+        ]);
+
+        return redirect()->route('admin.deliveries.index')->with('success', 'Delivery type created');
     }
 }

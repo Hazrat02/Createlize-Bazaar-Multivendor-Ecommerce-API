@@ -16,10 +16,27 @@ use Inertia\Response;
 
 class ProductAdminController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $query = Product::query()
+            ->with(['vendor','category','subCategory','deliveryType'])
+            ->latest();
+
+        if ($request->filled('q')) {
+            $search = $request->string('q')->toString();
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%")
+                    ->orWhereHas('vendor', function ($vendorQuery) use ($search) {
+                        $vendorQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
         return Inertia::render('Admin/Products/Index', [
-            'products' => Product::query()->with(['vendor','category','subCategory','deliveryType'])->latest()->paginate(20),
+            'products' => $query->paginate(20)->withQueryString(),
+            'filters' => $request->only('q'),
         ]);
     }
 
