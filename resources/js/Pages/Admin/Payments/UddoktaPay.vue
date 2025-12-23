@@ -46,6 +46,18 @@
             </div>
             <div class="col-md-6">
               <div class="input-style-1">
+                <label>Redirect URL</label>
+                <input v-model="form.redirect_url" type="text" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>Cancel URL</label>
+                <input v-model="form.cancel_url" type="text" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
                 <label>Live Base URL</label>
                 <input v-model="form.live_base_url" type="text" class="form-control" />
               </div>
@@ -87,6 +99,8 @@ const form = useForm({
   sandbox_base_url: props.settings.sandbox_base_url || 'https://sandbox.uddoktapay.com',
   sandbox_api_key: props.settings.sandbox_api_key || '',
   sandbox_secret: props.settings.sandbox_secret || '',
+  redirect_url: props.settings.redirect_url || '',
+  cancel_url: props.settings.cancel_url || '',
   live_base_url: props.settings.live_base_url || '',
   live_api_key: props.settings.live_api_key || '',
   live_secret: props.settings.live_secret || '',

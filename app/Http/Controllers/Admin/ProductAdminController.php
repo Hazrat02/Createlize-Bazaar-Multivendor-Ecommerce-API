@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\DeliveryType;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\SubCategory;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -46,7 +48,7 @@ class ProductAdminController extends Controller
             'vendors' => User::query()->role('Vendor')->orderBy('name')->get(['id','name','email']),
             'categories' => Category::query()->orderBy('name')->get(['id','name']),
             'subcategories' => SubCategory::query()->orderBy('name')->get(['id','name','category_id']),
-            'deliveryTypes' => DeliveryType::query()->orderBy('name')->get(['id','name','code']),
+            'deliveryTypes' => DeliveryType::query()->orderBy('name')->get(['id','name','key']),
         ]);
     }
 
@@ -65,27 +67,50 @@ class ProductAdminController extends Controller
             'discount_percent' => ['nullable','integer','min:0','max:100'],
             'stock' => ['nullable','integer','min:0'],
             'sku' => ['nullable','string','max:100'],
+            'tags' => ['nullable','string','max:500'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
+            'images' => ['nullable','array'],
+            'images.*' => ['image','max:4096'],
         ]);
 
         $data['slug'] = Str::slug($data['name']).'-'.Str::lower(Str::random(6));
-        $data['tags'] = [];
+        $data['tags'] = $this->parseTags($data['tags'] ?? null);
         $data['meta'] = [];
 
-        Product::create($data);
+        $images = $request->file('images', []);
+
+        $product = Product::create($data);
+
+        $this->storeImages($product, $images);
 
         return redirect()->route('admin.products.index')->with('success','Product created');
+    }
+
+    public function show(Product $product): Response
+    {
+        return Inertia::render('Admin/Products/Show', [
+            'product' => $product->load([
+                'vendor',
+                'category',
+                'subCategory',
+                'deliveryType',
+                'images' => fn($query) => $query->orderBy('sort_order'),
+            ]),
+        ]);
     }
 
     public function edit(Product $product): Response
     {
         return Inertia::render('Admin/Products/Edit', [
-            'product' => $product->load(['images','files']),
+            'product' => $product->load([
+                'images' => fn($query) => $query->orderBy('sort_order'),
+                'files',
+            ]),
             'vendors' => User::query()->role('Vendor')->orderBy('name')->get(['id','name','email']),
             'categories' => Category::query()->orderBy('name')->get(['id','name']),
             'subcategories' => SubCategory::query()->orderBy('name')->get(['id','name','category_id']),
-            'deliveryTypes' => DeliveryType::query()->orderBy('name')->get(['id','name','code']),
+            'deliveryTypes' => DeliveryType::query()->orderBy('name')->get(['id','name','key']),
         ]);
     }
 
@@ -104,18 +129,79 @@ class ProductAdminController extends Controller
             'discount_percent' => ['nullable','integer','min:0','max:100'],
             'stock' => ['nullable','integer','min:0'],
             'sku' => ['nullable','string','max:100'],
+            'tags' => ['nullable','string','max:500'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
+            'images' => ['nullable','array'],
+            'images.*' => ['image','max:4096'],
         ]);
+
+        $data['tags'] = $this->parseTags($data['tags'] ?? null);
 
         $product->update($data);
 
+        $images = $request->file('images', []);
+        $this->storeImages($product, $images);
+
         return redirect()->route('admin.products.index')->with('success','Product updated');
+    }
+
+    public function addImages(Request $request, Product $product): RedirectResponse
+    {
+        $data = $request->validate([
+            'images' => ['required','array'],
+            'images.*' => ['image','max:4096'],
+        ]);
+
+        $this->storeImages($product, $data['images']);
+
+        return back()->with('success', 'Images uploaded');
+    }
+
+    public function removeImage(Product $product, ProductImage $image): RedirectResponse
+    {
+        if ($image->product_id !== $product->id) {
+            return back()->with('error', 'Image not found.');
+        }
+
+        Storage::disk('public')->delete($image->path);
+        $image->delete();
+
+        return back()->with('success', 'Image removed');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
         return redirect()->route('admin.products.index')->with('success','Product deleted');
+    }
+
+    private function parseTags(?string $tags): array
+    {
+        if (!$tags) {
+            return [];
+        }
+
+        return collect(explode(',', $tags))
+            ->map(fn($tag) => trim($tag))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function storeImages(Product $product, array $images): void
+    {
+        if (empty($images)) {
+            return;
+        }
+
+        $maxOrder = (int)$product->images()->max('sort_order');
+        foreach ($images as $index => $image) {
+            $path = $image->store('products', 'public');
+            $product->images()->create([
+                'path' => $path,
+                'sort_order' => $maxOrder + $index + 1,
+            ]);
+        }
     }
 }

@@ -16,7 +16,10 @@
         <div class="left">
           <h6 class="text-medium mb-30">{{ t('orders_title') }}</h6>
         </div>
-        <div class="right">
+        <div class="right d-flex align-items-center gap-2">
+          <Link href="/admin/orders/demo" class="main-btn primary-btn btn-hover btn-sm">
+            Create Demo Order
+          </Link>
           <div class="select-style-1">
             <div class="select-position select-sm">
               <input

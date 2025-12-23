@@ -5,12 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDeliveryFile;
+use App\Models\Product;
 use App\Models\Setting;
+use App\Models\User;
+use App\Services\Cart\CartService;
+use App\Services\Orders\CheckoutService;
+use App\Services\Orders\RequiredFieldsBuilder;
+use App\Services\Settings\SettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class OrderAdminController extends Controller
 {
@@ -91,5 +99,168 @@ class OrderAdminController extends Controller
             'order' => $order->load(['customer','vendor','items.product']),
             'template' => $template,
         ]);
+    }
+
+    public function demoCreate(): Response
+    {
+        $users = User::query()
+            ->role('Customer')
+            ->orderBy('name')
+            ->get(['id','name','email']);
+
+        $products = Product::query()
+            ->where('is_active', true)
+            ->with('vendor:id,name')
+            ->orderByDesc('id')
+            ->get(['id','name','title','vendor_id','price','discount_percent','currency'])
+            ->map(function (Product $product) {
+                $name = $product->title ?: $product->name;
+                $vendor = $product->vendor?->name ?? 'Vendor';
+                $product->display_name = "{$name} ({$vendor})";
+                return $product;
+            });
+
+        return Inertia::render('Admin/Orders/DemoCreate', [
+            'users' => $users,
+            'products' => $products,
+        ]);
+    }
+
+    public function demoStore(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'user_id' => ['required','integer','exists:users,id'],
+            'product_id' => ['required','integer','exists:products,id'],
+            'qty' => ['required','integer','min:1'],
+        ]);
+
+        $request->session()->put('demo_order', [
+            'user_id' => (int)$data['user_id'],
+            'product_id' => (int)$data['product_id'],
+            'qty' => (int)$data['qty'],
+        ]);
+
+        return redirect()->route('admin.orders.demo.checkout');
+    }
+
+    public function demoCheckout(
+        Request $request,
+        RequiredFieldsBuilder $fieldsBuilder,
+        SettingsService $settings
+    ): RedirectResponse|Response {
+        $demo = $request->session()->get('demo_order');
+        if (!$demo) {
+            return redirect()->route('admin.orders.demo.create')
+                ->with('error', 'Demo order not found. Please start again.');
+        }
+
+        $user = User::query()->findOrFail((int)$demo['user_id']);
+        $product = Product::query()->with('deliveryType')->findOrFail((int)$demo['product_id']);
+
+        $requiredFields = $fieldsBuilder->build($product);
+        $paymentMode = (string)$settings->get('payment_uddoktapay', 'mode', 'sandbox');
+        $paymentMethod = ($product->deliveryType?->key === 'cod') ? 'cod' : 'uddoktapay';
+
+        $unitPrice = (float)$product->final_price;
+        $qty = (int)$demo['qty'];
+        $total = round($unitPrice * $qty, 2);
+
+        $product->display_name = $product->title ?: $product->name;
+
+        return Inertia::render('Admin/Orders/DemoCheckout', [
+            'user' => $user->only(['id','name','email']),
+            'product' => [
+                'id' => $product->id,
+                'display_name' => $product->display_name,
+                'currency' => $product->currency,
+                'unit_price' => $unitPrice,
+            ],
+            'qty' => $qty,
+            'total' => $total,
+            'requiredFields' => $requiredFields,
+            'paymentMode' => $paymentMode,
+            'paymentMethod' => $paymentMethod,
+        ]);
+    }
+
+    public function demoCheckoutSubmit(
+        Request $request,
+        CartService $cart,
+        RequiredFieldsBuilder $fieldsBuilder,
+        CheckoutService $checkout
+    ): RedirectResponse|HttpResponse {
+        $demo = $request->session()->get('demo_order');
+        if (!$demo) {
+            return redirect()->route('admin.orders.demo.create')
+                ->with('error', 'Demo order not found. Please start again.');
+        }
+
+        $user = User::query()->findOrFail((int)$demo['user_id']);
+        $product = Product::query()->with('deliveryType')->findOrFail((int)$demo['product_id']);
+        $requiredFields = $fieldsBuilder->build($product);
+
+        $requiredData = (array)$request->input('required_data', []);
+        $fileUploads = [];
+
+        foreach ($requiredFields as $field) {
+            if (($field['type'] ?? '') !== 'file') {
+                continue;
+            }
+
+            $fieldName = $field['name'];
+            $fileKey = "required_data.$fieldName";
+            if ($request->hasFile($fileKey)) {
+                $file = $request->file($fileKey);
+                $path = $file->store('order-required', 'private');
+                $fileUploads[$fieldName] = [
+                    'path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                ];
+                $requiredData[$fieldName] = $file->getClientOriginalName();
+            }
+        }
+
+        $cart->clear();
+        $cart->add($product->id, (int)$demo['qty']);
+
+        $appUrl = $request->getSchemeAndHttpHost();
+
+        try {
+            $result = $checkout->checkout($user, [
+                'required_data' => $requiredData,
+                'redirect_url' => $appUrl,
+                'cancel_url' => $appUrl,
+            ]);
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
+
+        $orderNumber = $result['order_number'] ?? null;
+        if ($orderNumber && !empty($fileUploads)) {
+            $order = Order::query()->where('order_number', $orderNumber)->first();
+            if ($order) {
+                foreach ($fileUploads as $fieldName => $fileInfo) {
+                    $order->requiredData()
+                        ->where('field_name', $fieldName)
+                        ->update([
+                            'file_path' => $fileInfo['path'],
+                            'value' => $fileInfo['original_name'],
+                        ]);
+                }
+            }
+        }
+
+        $request->session()->put('demo_order_last', [
+            'order_number' => $orderNumber,
+        ]);
+
+        $payment = $result['payment'] ?? [];
+        $paymentUrl = $payment['payment_url'] ?? null;
+        if ($paymentUrl) {
+            return Inertia::location($paymentUrl);
+        }
+
+        return redirect()->route('admin.orders.index')
+            ->with('success', 'Demo order created.');
     }
 }

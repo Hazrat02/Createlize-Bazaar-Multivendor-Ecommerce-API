@@ -191,5 +191,10 @@ return [
     'search_product_placeholder' => 'Search product...',
     'product' => 'Product',
     'value' => 'Value',
+    'create_user' => 'Create User',
+    'edit_user' => 'Edit User',
+    'email' => 'Email',
+    'password' => 'Password',
+    'profile_image' => 'Profile image',
 ];
 

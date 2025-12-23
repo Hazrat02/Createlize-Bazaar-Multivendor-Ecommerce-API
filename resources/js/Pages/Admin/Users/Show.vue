@@ -33,7 +33,7 @@
           </div>
           <div class="profile-block mt-3">
             <div class="profile-avatar">
-              <img src="@/../admin/assets/images/profile/profile-image.png" alt="" />
+              <img :src="profileImageUrl" alt="" />
             </div>
             <div class="profile-details">
               <h6 class="mb-1">{{ user.name }}</h6>
@@ -182,6 +182,13 @@ const mailOpen = ref(false)
 const mailForm = useForm({
   subject: '',
   message: '',
+})
+
+const profileImageUrl = computed(() => {
+  if (props.user.profile_image) {
+    return `/storage/${props.user.profile_image}`
+  }
+  return new URL('@/../admin/assets/images/profile/profile-image.png', import.meta.url).href
 })
 
 function openMail() {

@@ -114,10 +114,10 @@
           </thead>
           <tbody>
             <tr v-for="item in order.items" :key="item.id">
-              <td class="fw-semibold">{{ item.product?.name || '-' }}</td>
-              <td class="text-muted">{{ formatAmount(item.price) }}</td>
-              <td class="text-muted">{{ item.quantity || 1 }}</td>
-              <td class="text-muted">{{ formatAmount(item.total) }}</td>
+              <td class="fw-semibold">{{ item.product_name || item.product?.name || '-' }}</td>
+              <td class="text-muted">{{ formatAmount(item.unit_price) }}</td>
+              <td class="text-muted">{{ item.qty || 1 }}</td>
+              <td class="text-muted">{{ formatAmount(item.line_total) }}</td>
             </tr>
             <tr v-if="!order.items.length">
               <td colspan="4" class="text-center text-muted py-3">{{ t('no_items_found') }}</td>

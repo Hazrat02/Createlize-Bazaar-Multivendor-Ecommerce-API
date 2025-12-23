@@ -50,10 +50,10 @@
       <tbody>
         @foreach ($order->items as $item)
           <tr>
-            <td>{{ $item->product?->name ?? 'Item' }}</td>
-            <td>{{ $item->quantity ?? 1 }}</td>
-            <td>{{ number_format((float) ($item->price ?? 0), 2) }}</td>
-            <td>{{ number_format((float) ($item->total ?? 0), 2) }}</td>
+            <td>{{ $item->product_name ?? $item->product?->name ?? 'Item' }}</td>
+            <td>{{ $item->qty ?? 1 }}</td>
+            <td>{{ number_format((float) ($item->unit_price ?? 0), 2) }}</td>
+            <td>{{ number_format((float) ($item->line_total ?? 0), 2) }}</td>
           </tr>
         @endforeach
       </tbody>

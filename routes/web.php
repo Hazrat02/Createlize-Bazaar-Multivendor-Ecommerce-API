@@ -76,10 +76,16 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::post('vendors/{user}/unban', [VendorAdminController::class, 'unban'])->name('vendors.unban');
 
     Route::resource('products', ProductAdminController::class);
+    Route::post('products/{product}/images', [ProductAdminController::class, 'addImages'])->name('products.images.store');
+    Route::delete('products/{product}/images/{image}', [ProductAdminController::class, 'removeImage'])->name('products.images.destroy');
     Route::resource('users', UserAdminController::class);
     Route::post('users/{user}/ban', [UserAdminController::class, 'ban'])->name('users.ban');
     Route::post('users/{user}/unban', [UserAdminController::class, 'unban'])->name('users.unban');
     Route::post('users/{user}/mail', [UserAdminController::class, 'sendMail'])->name('users.mail');
+    Route::get('orders/demo', [OrderAdminController::class, 'demoCreate'])->name('orders.demo.create');
+    Route::post('orders/demo', [OrderAdminController::class, 'demoStore'])->name('orders.demo.store');
+    Route::get('orders/demo/checkout', [OrderAdminController::class, 'demoCheckout'])->name('orders.demo.checkout');
+    Route::post('orders/demo/checkout', [OrderAdminController::class, 'demoCheckoutSubmit'])->name('orders.demo.checkout.submit');
     Route::resource('orders', OrderAdminController::class)->only(['index','show','update']);
     Route::post('orders/{order}/deliveries/upload', [OrderAdminController::class, 'uploadDeliveryFile'])->name('orders.deliveries.upload');
     Route::get('orders/{order}/invoice', [OrderAdminController::class, 'invoice'])->name('orders.invoice');
@@ -107,6 +113,11 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('api-docs', [ApiDocsController::class, 'index'])->name('api-docs');
 });
+
+Route::match(['get','post'], '/payment/success', [\App\Http\Controllers\PaymentCallbackController::class, 'success'])
+    ->name('payment.success');
+Route::match(['get','post'], '/payment/cancel', [\App\Http\Controllers\PaymentCallbackController::class, 'cancel'])
+    ->name('payment.cancel');
 
 // Secure download routes (signed)
 Route::middleware('auth')->get('/downloads/{token}', 

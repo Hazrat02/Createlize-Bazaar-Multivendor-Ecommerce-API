@@ -130,8 +130,8 @@ class CheckoutService
             }
 
             // Create payment at UddoktaPay and return payment_url
-            $redirectUrl = (string)$this->settings->get('payment_uddoktapay', 'redirect_url', config('app.url'));
-            $cancelUrl = (string)$this->settings->get('payment_uddoktapay', 'cancel_url', config('app.url'));
+            $redirectUrl = (string)($payload['redirect_url'] ?? $this->settings->get('payment_uddoktapay', 'redirect_url', config('app.url')));
+            $cancelUrl = (string)($payload['cancel_url'] ?? $this->settings->get('payment_uddoktapay', 'cancel_url', config('app.url')));
 
             $charge = $this->uddoktaPay->createCharge([
                 'full_name' => $user->name,

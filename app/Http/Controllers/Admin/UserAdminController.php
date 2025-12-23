@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,11 +46,15 @@ class UserAdminController extends Controller
             'password' => ['required','string','min:6'],
             'status' => ['required','in:active,banned'],
             'role' => ['required','in:Admin,Vendor,Customer'],
+            'profile_image' => ['required','image','max:4096'],
         ]);
+
+        $path = $data['profile_image']->store('users', 'public');
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'profile_image' => $path,
             'password' => bcrypt($data['password']),
             'status' => $data['status'],
         ]);
@@ -97,11 +102,21 @@ class UserAdminController extends Controller
             'password' => ['nullable','string','min:6'],
             'status' => ['required','in:active,banned'],
             'role' => ['required','in:Admin,Vendor,Customer'],
+            'profile_image' => ['nullable','image','max:4096'],
         ]);
+
+        $profileImagePath = $user->profile_image;
+        if (!empty($data['profile_image'])) {
+            if ($profileImagePath) {
+                Storage::disk('public')->delete($profileImagePath);
+            }
+            $profileImagePath = $data['profile_image']->store('users', 'public');
+        }
 
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
+            'profile_image' => $profileImagePath,
             'status' => $data['status'],
             'password' => $data['password'] ? bcrypt($data['password']) : $user->password,
         ]);

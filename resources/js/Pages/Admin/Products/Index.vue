@@ -79,6 +79,9 @@
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end" :class="{ show: openMenuId === product.id }">
                     <li class="dropdown-item">
+                      <Link :href="`/admin/products/${product.id}`" class="text-gray">Overview</Link>
+                    </li>
+                    <li class="dropdown-item">
                       <Link :href="`/admin/products/${product.id}/edit`" class="text-gray">{{ t('edit') }}</Link>
                     </li>
                     <li class="dropdown-item">
