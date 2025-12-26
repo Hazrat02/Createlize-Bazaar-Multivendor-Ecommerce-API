@@ -20,16 +20,17 @@ use App\Http\Controllers\Admin\SeoAdminController;
 use App\Http\Controllers\Admin\SettingAdminController;
 use App\Http\Controllers\Admin\ApiDocsController;
 use App\Http\Controllers\Admin\DownloadAdminController;
+use App\Http\Controllers\Admin\ProfileAdminController;
 
 // Route::get('/', fn() => redirect()->route('admin.dashboard'));
 // Secure download routes (signed)
 Route::middleware('auth','role:Admin')->get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::get('/admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
-Route::post('/admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
-Route::post('/admin/logout', [AdminAuthController::class, 'destroy'])->middleware('auth')->name('admin.logout');
+Route::get('/admin/login', [AdminAuthController::class, 'create'])->middleware('admin')->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'store'])->middleware('admin')->name('admin.login.store');
+Route::post('/admin/logout', [AdminAuthController::class, 'destroy'])->middleware(['admin','auth:admin'])->name('admin.logout');
 
-Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['admin','auth:admin', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('locale', function () {
         return redirect('/');
     })->name('locale.show');
@@ -79,6 +80,7 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::post('products/{product}/images', [ProductAdminController::class, 'addImages'])->name('products.images.store');
     Route::delete('products/{product}/images/{image}', [ProductAdminController::class, 'removeImage'])->name('products.images.destroy');
     Route::resource('users', UserAdminController::class);
+    Route::post('users/google-settings', [UserAdminController::class, 'updateGoogleSettings'])->name('users.google-settings');
     Route::post('users/{user}/ban', [UserAdminController::class, 'ban'])->name('users.ban');
     Route::post('users/{user}/unban', [UserAdminController::class, 'unban'])->name('users.unban');
     Route::post('users/{user}/mail', [UserAdminController::class, 'sendMail'])->name('users.mail');
@@ -112,6 +114,10 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::post('settings', [SettingAdminController::class, 'update'])->name('settings.update');
 
     Route::get('api-docs', [ApiDocsController::class, 'index'])->name('api-docs');
+
+    Route::get('profile', [ProfileAdminController::class, 'edit'])->name('profile.edit');
+    Route::post('profile', [ProfileAdminController::class, 'updateProfile'])->name('profile.update');
+    Route::post('profile/password', [ProfileAdminController::class, 'updatePassword'])->name('profile.password');
 });
 
 Route::match(['get','post'], '/payment/success', [\App\Http\Controllers\PaymentCallbackController::class, 'success'])

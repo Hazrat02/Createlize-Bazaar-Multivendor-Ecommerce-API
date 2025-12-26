@@ -11,7 +11,7 @@ class SubCategory extends Model
 
     protected $table = 'sub_categories';
 
-    protected $fillable = ['category_id','name','slug','is_active','sort_order'];
+    protected $fillable = ['category_id','name','slug','is_active','sort_order','image_path','icon_path'];
 
     protected $casts = ['is_active'=>'boolean'];
 

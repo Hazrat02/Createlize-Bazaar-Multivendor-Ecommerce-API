@@ -1,0 +1,57 @@
+﻿{
+  "items": [
+    {
+      "id": 101,
+      "name": "Solid Pattern in Summer Dress",
+      "href": "/product",
+      "category": "Clothing",
+      "image": "/images/product/featured1.jpg",
+      "price": 140.0,
+      "oldPrice": null,
+      "ratingPercent": 100,
+      "reviewCount": 12,
+      "labels": [
+        { "text": "new", "class": "product-label label-new" }
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Mackintosh Poket Backpack",
+      "href": "/product",
+      "category": "Bags & Backpacks",
+      "image": "/images/product/featured2.jpg",
+      "price": 125.99,
+      "oldPrice": 160.99,
+      "ratingPercent": 60,
+      "reviewCount": 6,
+      "labels": [
+        { "text": "27% off", "class": "product-label label-sale" }
+      ]
+    },
+    {
+      "id": 103,
+      "name": "Fashionable Orginal Trucker",
+      "href": "/product",
+      "category": "Bags & Backpacks",
+      "image": "/images/product/featured3.jpg",
+      "price": 108.0,
+      "oldPrice": null,
+      "ratingPercent": 80,
+      "reviewCount": 9,
+      "labels": []
+    },
+    {
+      "id": 104,
+      "name": "Women Red Fur Overcoat",
+      "href": "/product",
+      "category": "Clothing",
+      "image": "/images/product/featured4.jpg",
+      "price": 95.0,
+      "oldPrice": 120.0,
+      "ratingPercent": 80,
+      "reviewCount": 11,
+      "labels": []
+    }
+  ]
+}
+

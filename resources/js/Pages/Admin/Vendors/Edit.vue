@@ -29,6 +29,16 @@
             </div>
             <div class="col-md-6">
               <div class="input-style-1">
+                <label>{{ t('vendor_logo') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onLogoChange" />
+                <div v-if="form.errors.logo" class="text-danger text-sm mt-1">{{ form.errors.logo }}</div>
+                <div v-if="logoPreview" class="mt-2">
+                  <img :src="logoPreview" alt="Vendor logo" style="max-width: 120px; height: auto;" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
                 <label>{{ t('phone') }}</label>
                 <input v-model="form.phone" type="text" class="form-control" />
               </div>
@@ -101,12 +111,25 @@ const form = useForm({
   balance: props.vendorProfile?.balance ?? 0,
   payout_info: props.vendorProfile?.payout_info ? JSON.stringify(props.vendorProfile.payout_info) : '',
   documents: props.vendorProfile?.documents ? props.vendorProfile.documents.join(', ') : '',
+  logo: null,
 })
+
+const logoPreview = computed(() => {
+  if (form.logo) return URL.createObjectURL(form.logo)
+  if (props.vendorProfile?.logo_path) return `/storage/${props.vendorProfile.logo_path}`
+  return ''
+})
+
+function onLogoChange(event) {
+  form.logo = event.target.files[0] || null
+}
 
 function submit() {
   if (!form.payout_info) {
     form.payout_info = null
   }
-  form.put(`/admin/vendors/${props.vendor.id}/profile`)
+  form
+    .transform((data) => ({ ...data, _method: 'put' }))
+    .post(`/admin/vendors/${props.vendor.id}/profile`, { forceFormData: true })
 }
 </script>

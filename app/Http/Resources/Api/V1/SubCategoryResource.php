@@ -14,6 +14,8 @@ class SubCategoryResource extends JsonResource
             'category_id' => $this->category_id,
             'name' => $this->name,
             'slug' => $this->slug,
+            'image_url' => $this->image_path ? asset('storage/' . $this->image_path) : null,
+            'icon_url' => $this->icon_path ? asset('storage/' . $this->icon_path) : null,
         ];
     }
 }

@@ -1,0 +1,29 @@
+﻿{
+  "items": [
+    {
+      "id": 1,
+      "name": "Beige knitted elastic runner shoes",
+      "href": "/product",
+      "image": "/images/products/product11.jpg",
+      "price": 84.0,
+      "stock": "In Stock"
+    },
+    {
+      "id": 2,
+      "name": "Sed diam nonummy nibh",
+      "href": "/product",
+      "image": "/images/products/product12.jpg",
+      "price": 84.0,
+      "stock": "In Stock"
+    },
+    {
+      "id": 3,
+      "name": "Lorem ipsum dolor sit amet, consectetuer adipiscing",
+      "href": "/product",
+      "image": "/images/products/product13.jpg",
+      "price": 84.0,
+      "stock": "Out of Stock"
+    }
+  ]
+}
+

@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Coupon;
+use App\Models\Product;
+use App\Models\SubCategory;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -21,7 +25,12 @@ class CouponAdminController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Admin/Coupons/Create');
+        return Inertia::render('Admin/Coupons/Create', [
+            'categories' => Category::query()->orderBy('name')->get(['id','name']),
+            'subcategories' => SubCategory::query()->orderBy('name')->get(['id','name','category_id']),
+            'vendors' => User::query()->role('Vendor')->orderBy('name')->get(['id','name','email']),
+            'products' => Product::query()->orderBy('name')->get(['id','name','title']),
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -55,6 +64,10 @@ class CouponAdminController extends Controller
     {
         return Inertia::render('Admin/Coupons/Edit', [
             'coupon' => $coupon,
+            'categories' => Category::query()->orderBy('name')->get(['id','name']),
+            'subcategories' => SubCategory::query()->orderBy('name')->get(['id','name','category_id']),
+            'vendors' => User::query()->role('Vendor')->orderBy('name')->get(['id','name','email']),
+            'products' => Product::query()->orderBy('name')->get(['id','name','title']),
         ]);
     }
 

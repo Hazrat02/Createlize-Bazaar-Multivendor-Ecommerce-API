@@ -42,6 +42,26 @@
               </div>
             </div>
             <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('subcategory_image') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onImageChange" />
+                <div v-if="form.errors.image" class="text-danger text-sm mt-1">{{ form.errors.image }}</div>
+                <div v-if="imagePreview" class="mt-2">
+                  <img :src="imagePreview" alt="Subcategory image" style="max-width: 140px; height: auto;" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('subcategory_icon') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onIconChange" />
+                <div v-if="form.errors.icon" class="text-danger text-sm mt-1">{{ form.errors.icon }}</div>
+                <div v-if="iconPreview" class="mt-2">
+                  <img :src="iconPreview" alt="Subcategory icon" style="max-width: 64px; height: auto;" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
               <div class="form-check form-switch mt-2">
                 <input id="subcategory-active" class="form-check-input" type="checkbox" v-model="form.is_active" />
                 <label class="form-check-label" for="subcategory-active">{{ t('active') }}</label>
@@ -80,9 +100,33 @@ const form = useForm({
   category_id: props.subcategory.category_id,
   name: props.subcategory.name,
   is_active: !!props.subcategory.is_active,
+  image: null,
+  icon: null,
 })
 
+const imagePreview = computed(() => {
+  if (form.image) return URL.createObjectURL(form.image)
+  if (props.subcategory.image_path) return `/storage/${props.subcategory.image_path}`
+  return ''
+})
+
+const iconPreview = computed(() => {
+  if (form.icon) return URL.createObjectURL(form.icon)
+  if (props.subcategory.icon_path) return `/storage/${props.subcategory.icon_path}`
+  return ''
+})
+
+function onImageChange(event) {
+  form.image = event.target.files[0] || null
+}
+
+function onIconChange(event) {
+  form.icon = event.target.files[0] || null
+}
+
 function submit() {
-  form.put(`/admin/subcategories/${props.subcategory.id}`)
+  form
+    .transform((data) => ({ ...data, _method: 'put' }))
+    .post(`/admin/subcategories/${props.subcategory.id}`, { forceFormData: true })
 }
 </script>

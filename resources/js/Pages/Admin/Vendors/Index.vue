@@ -158,6 +158,16 @@
             </div>
             <div class="col-md-6">
               <div class="input-style-1">
+                <label>{{ t('vendor_logo') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onLogoChange" />
+                <div v-if="form.errors.logo" class="text-danger text-sm mt-1">{{ form.errors.logo }}</div>
+                <div v-if="logoPreview" class="mt-2">
+                  <img :src="logoPreview" alt="Vendor logo" style="max-width: 120px; height: auto;" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
                 <label>{{ t('phone') }}</label>
                 <input v-model="form.phone" type="text" class="form-control" />
               </div>
@@ -240,7 +250,17 @@ const form = useForm({
   balance: 0,
   payout_info: '',
   documents: '',
+  logo: null,
 })
+
+const logoPreview = computed(() => {
+  if (form.logo) return URL.createObjectURL(form.logo)
+  return ''
+})
+
+function onLogoChange(event) {
+  form.logo = event.target.files[0] || null
+}
 
 function applySearch() {
   router.get('/admin/vendors', { q: q.value || undefined, user_q: userQuery.value || undefined }, { preserveState: true, replace: true })
@@ -272,6 +292,7 @@ function submit() {
     form.payout_info = null
   }
   form.post('/admin/vendors', {
+    forceFormData: true,
     preserveScroll: true,
     onSuccess: () => {
       form.reset()

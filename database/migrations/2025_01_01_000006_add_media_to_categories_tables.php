@@ -1,0 +1,31 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::table('categories', function (Blueprint $table) {
+            $table->string('image_path')->nullable()->after('sort_order');
+            $table->string('icon_path')->nullable()->after('image_path');
+        });
+
+        Schema::table('sub_categories', function (Blueprint $table) {
+            $table->string('image_path')->nullable()->after('sort_order');
+            $table->string('icon_path')->nullable()->after('image_path');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('categories', function (Blueprint $table) {
+            $table->dropColumn(['image_path', 'icon_path']);
+        });
+
+        Schema::table('sub_categories', function (Blueprint $table) {
+            $table->dropColumn(['image_path', 'icon_path']);
+        });
+    }
+};

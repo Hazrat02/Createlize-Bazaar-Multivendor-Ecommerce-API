@@ -27,6 +27,26 @@
                 <div v-if="form.errors.name" class="text-danger text-sm mt-1">{{ form.errors.name }}</div>
               </div>
             </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('category_image') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onImageChange" />
+                <div v-if="form.errors.image" class="text-danger text-sm mt-1">{{ form.errors.image }}</div>
+                <div v-if="imagePreview" class="mt-2">
+                  <img :src="imagePreview" alt="Category image" style="max-width: 140px; height: auto;" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('category_icon') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onIconChange" />
+                <div v-if="form.errors.icon" class="text-danger text-sm mt-1">{{ form.errors.icon }}</div>
+                <div v-if="iconPreview" class="mt-2">
+                  <img :src="iconPreview" alt="Category icon" style="max-width: 64px; height: auto;" />
+                </div>
+              </div>
+            </div>
             <div class="col-12">
               <button type="submit" class="main-btn primary-btn btn-hover" :disabled="form.processing">
                 {{ form.processing ? t('saving') : t('update') }}
@@ -57,9 +77,33 @@ function t(key) {
 
 const form = useForm({
   name: props.category.name,
+  image: null,
+  icon: null,
 })
 
+const imagePreview = computed(() => {
+  if (form.image) return URL.createObjectURL(form.image)
+  if (props.category.image_path) return `/storage/${props.category.image_path}`
+  return ''
+})
+
+const iconPreview = computed(() => {
+  if (form.icon) return URL.createObjectURL(form.icon)
+  if (props.category.icon_path) return `/storage/${props.category.icon_path}`
+  return ''
+})
+
+function onImageChange(event) {
+  form.image = event.target.files[0] || null
+}
+
+function onIconChange(event) {
+  form.icon = event.target.files[0] || null
+}
+
 function submit() {
-  form.put(`/admin/categories/${props.category.id}`)
+  form
+    .transform((data) => ({ ...data, _method: 'put' }))
+    .post(`/admin/categories/${props.category.id}`, { forceFormData: true })
 }
 </script>

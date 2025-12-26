@@ -93,6 +93,15 @@
                     </div>
                   </div>
                 </template>
+                <div class="col-12">
+                  <div class="input-style-1">
+                    <label>Coupon Code</label>
+                    <input v-model="form.coupon_code" type="text" class="form-control" placeholder="Optional" />
+                    <div v-if="form.errors.coupon_code" class="text-danger text-sm mt-1">
+                      {{ form.errors.coupon_code }}
+                    </div>
+                  </div>
+                </div>
                 <div class="col-12 mt-2">
                   <button type="submit" class="main-btn primary-btn btn-hover" :disabled="form.processing">
                     {{ form.processing ? 'Redirecting...' : submitLabel }}
@@ -124,6 +133,7 @@ const props = defineProps({
 
 const form = useForm({
   required_data: {},
+  coupon_code: '',
 })
 
 const paymentMethodLabel = computed(() => {

@@ -65,14 +65,53 @@ class PaymentCallbackController extends Controller
         $this->applySmtpSettings();
 
         $template = Setting::query()->where('key', 'invoice.template')->first()?->value ?? [];
-        $subject = $template['email_subject'] ?? ('Invoice #' . ($order->order_number ?? $order->id));
+        $smtpTemplate = Setting::query()->where('key', 'smtp')->first()?->value ?? [];
+        $subjectBase = 'Invoice #' . ($order->order_number ?? $order->id);
+        $subjectTemplate = $smtpTemplate['template_subject'] ?? null;
+        $bodyTemplate = $smtpTemplate['template_body'] ?? null;
+        $invoiceHtml = view('emails.invoice-fragment', [
+            'order' => $order,
+            'template' => $template,
+        ])->render();
+
+        $replace = [
+            '{{order_number}}' => $order->order_number ?? (string)$order->id,
+            '{{customer_name}}' => $customer->name ?? '',
+            '{{customer_email}}' => $customer->email ?? '',
+            '{{total}}' => number_format((float)($order->total ?? 0), 2),
+            '{{date}}' => $order->created_at?->format('Y-m-d') ?? '',
+            '{{name}}' => $customer->name ?? '',
+            '{{email}}' => $customer->email ?? '',
+            '{{subject}}' => $subjectBase,
+            '{{invoice_html}}' => $invoiceHtml,
+        ];
+
+        if ($bodyTemplate) {
+            $subject = $subjectTemplate ? strtr($subjectTemplate, $replace) : $subjectBase;
+
+            $marker = '__INVOICE_MESSAGE__';
+            $body = strtr($bodyTemplate, array_merge($replace, ['{{message}}' => $marker]));
+            $body = preg_replace('#<p[^>]*>\s*' . preg_quote($marker, '#') . '\s*</p>#i', $marker, $body);
+            $body = str_replace($marker, $invoiceHtml, $body);
+
+            if (!str_contains($bodyTemplate, '{{message}}') && !str_contains($bodyTemplate, '{{invoice_html}}')) {
+                $body .= $invoiceHtml;
+            }
+
+            Mail::send([], [], function ($mail) use ($customer, $subject, $body) {
+                $mail->to($customer->email)
+                    ->subject(Str::limit($subject, 150))
+                    ->html($body);
+            });
+            return;
+        }
 
         Mail::send('emails.invoice', [
             'order' => $order,
             'template' => $template,
-        ], function ($mail) use ($customer, $subject) {
+        ], function ($mail) use ($customer, $subjectBase) {
             $mail->to($customer->email)
-                ->subject(Str::limit($subject, 150));
+                ->subject(Str::limit($subjectBase, 150));
         });
     }
 

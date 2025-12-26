@@ -14,7 +14,9 @@ use App\Services\Orders\RequiredFieldsBuilder;
 use App\Services\Settings\SettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -62,7 +64,12 @@ class OrderAdminController extends Controller
             'payment_status' => ['required','in:pending,paid,unpaid,failed'],
         ]);
 
+        $wasDelivered = $order->order_status === 'delivered';
         $order->update($data);
+
+        if (!$wasDelivered && $data['order_status'] === 'delivered') {
+            $this->sendInvoiceEmail($order->load(['customer','items.product','vendor']));
+        }
 
         return back()->with('success', 'Order updated');
     }
@@ -200,6 +207,7 @@ class OrderAdminController extends Controller
         $requiredFields = $fieldsBuilder->build($product);
 
         $requiredData = (array)$request->input('required_data', []);
+        $couponCode = $request->input('coupon_code');
         $fileUploads = [];
 
         foreach ($requiredFields as $field) {
@@ -228,6 +236,7 @@ class OrderAdminController extends Controller
         try {
             $result = $checkout->checkout($user, [
                 'required_data' => $requiredData,
+                'coupon_code' => $couponCode ?: null,
                 'redirect_url' => $appUrl,
                 'cancel_url' => $appUrl,
             ]);
@@ -262,5 +271,82 @@ class OrderAdminController extends Controller
 
         return redirect()->route('admin.orders.index')
             ->with('success', 'Demo order created.');
+    }
+
+    private function sendInvoiceEmail(Order $order): void
+    {
+        $customer = $order->customer;
+        if (!$customer || !$customer->email) {
+            return;
+        }
+
+        $this->applySmtpSettings();
+
+        $template = Setting::query()->where('key', 'invoice.template')->first()?->value ?? [];
+        $smtpTemplate = Setting::query()->where('key', 'smtp')->first()?->value ?? [];
+        $subjectBase = 'Invoice #' . ($order->order_number ?? $order->id);
+        $subjectTemplate = $smtpTemplate['template_subject'] ?? null;
+        $bodyTemplate = $smtpTemplate['template_body'] ?? null;
+        $invoiceHtml = view('emails.invoice-fragment', [
+            'order' => $order,
+            'template' => $template,
+        ])->render();
+
+        $replace = [
+            '{{order_number}}' => $order->order_number ?? (string)$order->id,
+            '{{customer_name}}' => $customer->name ?? '',
+            '{{customer_email}}' => $customer->email ?? '',
+            '{{total}}' => number_format((float)($order->total ?? 0), 2),
+            '{{date}}' => $order->created_at?->format('Y-m-d') ?? '',
+            '{{name}}' => $customer->name ?? '',
+            '{{email}}' => $customer->email ?? '',
+            '{{subject}}' => $subjectBase,
+            '{{invoice_html}}' => $invoiceHtml,
+        ];
+
+        if ($bodyTemplate) {
+            $subject = $subjectTemplate ? strtr($subjectTemplate, $replace) : $subjectBase;
+
+            $marker = '__INVOICE_MESSAGE__';
+            $body = strtr($bodyTemplate, array_merge($replace, ['{{message}}' => $marker]));
+            $body = preg_replace('#<p[^>]*>\s*' . preg_quote($marker, '#') . '\s*</p>#i', $marker, $body);
+            $body = str_replace($marker, $invoiceHtml, $body);
+
+            if (!str_contains($bodyTemplate, '{{message}}') && !str_contains($bodyTemplate, '{{invoice_html}}')) {
+                $body .= $invoiceHtml;
+            }
+
+            Mail::send([], [], function ($mail) use ($customer, $subject, $body) {
+                $mail->to($customer->email)
+                    ->subject(Str::limit($subject, 150))
+                    ->html($body);
+            });
+            return;
+        }
+
+        Mail::send('emails.invoice', [
+            'order' => $order,
+            'template' => $template,
+        ], function ($mail) use ($customer, $subjectBase) {
+            $mail->to($customer->email)
+                ->subject(Str::limit($subjectBase, 150));
+        });
+    }
+
+    private function applySmtpSettings(): void
+    {
+        $smtp = Setting::query()->where('key', 'smtp')->first()?->value;
+        if (!$smtp) {
+            return;
+        }
+
+        config()->set('mail.default', $smtp['mailer'] ?? 'smtp');
+        config()->set('mail.mailers.smtp.host', $smtp['host'] ?? '');
+        config()->set('mail.mailers.smtp.port', $smtp['port'] ?? 587);
+        config()->set('mail.mailers.smtp.username', $smtp['username'] ?? null);
+        config()->set('mail.mailers.smtp.password', $smtp['password'] ?? null);
+        config()->set('mail.mailers.smtp.encryption', $smtp['encryption'] ?? null);
+        config()->set('mail.from.address', $smtp['from_address'] ?? 'no-reply@example.com');
+        config()->set('mail.from.name', $smtp['from_name'] ?? 'Admin');
     }
 }

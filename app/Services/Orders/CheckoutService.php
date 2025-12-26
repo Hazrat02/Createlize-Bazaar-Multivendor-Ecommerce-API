@@ -12,6 +12,7 @@ use App\Services\Coupons\CouponService;
 use App\Services\Payments\UddoktaPayService;
 use App\Services\Settings\SettingsService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -65,9 +66,10 @@ class CheckoutService
         $requiredFields = $this->fieldsBuilder->build($firstProduct);
 
         $requiredData = $payload['required_data'] ?? [];
-        $this->validateRequiredData($requiredFields, $requiredData);
+        $requiredFiles = $payload['required_files'] ?? [];
+        $this->validateRequiredData($requiredFields, $requiredData, $requiredFiles);
 
-        return DB::transaction(function () use ($user, $vendorId, $items, $subtotal, $discount, $total, $firstProduct, $deliveryType, $couponData, $paymentType, $requiredFields, $requiredData, $isCod) {
+        return DB::transaction(function () use ($user, $vendorId, $items, $subtotal, $discount, $total, $firstProduct, $deliveryType, $couponData, $paymentType, $requiredFields, $requiredData, $requiredFiles, $isCod) {
 
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
@@ -108,6 +110,14 @@ class CheckoutService
             foreach ($requiredFields as $field) {
                 $name = $field['name'];
                 $val = $requiredData[$name] ?? null;
+                $filePath = null;
+
+                if (($field['type'] ?? '') === 'file') {
+                    $file = $requiredFiles[$name] ?? null;
+                    if ($file) {
+                        $filePath = $file->store('orders/required', 'public');
+                    }
+                }
 
                 OrderRequiredData::create([
                     'order_id' => $order->id,
@@ -115,7 +125,7 @@ class CheckoutService
                     'field_name' => $name,
                     'field_type' => $field['type'],
                     'value' => is_scalar($val) ? (string)$val : null,
-                    'file_path' => null,
+                    'file_path' => $filePath,
                 ]);
             }
 
@@ -158,13 +168,20 @@ class CheckoutService
         });
     }
 
-    private function validateRequiredData(array $requiredFields, array $requiredData): void
+    private function validateRequiredData(array $requiredFields, array $requiredData, array $requiredFiles): void
     {
         foreach ($requiredFields as $field) {
             if (!($field['required'] ?? false)) continue;
             $name = $field['name'];
             $val = $requiredData[$name] ?? null;
-            if ($val === null || $val === '') {
+            $file = $requiredFiles[$name] ?? null;
+            $isFile = ($field['type'] ?? '') === 'file';
+            if ($isFile && !$file) {
+                throw ValidationException::withMessages([
+                    "required_data.$name" => "{$field['title']} is required."
+                ]);
+            }
+            if (!$isFile && ($val === null || $val === '')) {
                 throw ValidationException::withMessages([
                     "required_data.$name" => "{$field['title']} is required."
                 ]);

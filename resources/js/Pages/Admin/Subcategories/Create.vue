@@ -42,6 +42,20 @@
               </div>
             </div>
             <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('subcategory_image') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onImageChange" />
+                <div v-if="form.errors.image" class="text-danger text-sm mt-1">{{ form.errors.image }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('subcategory_icon') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onIconChange" />
+                <div v-if="form.errors.icon" class="text-danger text-sm mt-1">{{ form.errors.icon }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
               <div class="form-check form-switch mt-2">
                 <input id="subcategory-active" class="form-check-input" type="checkbox" v-model="form.is_active" />
                 <label class="form-check-label" for="subcategory-active">{{ t('active') }}</label>
@@ -79,9 +93,19 @@ const form = useForm({
   category_id: '',
   name: '',
   is_active: true,
+  image: null,
+  icon: null,
 })
 
+function onImageChange(event) {
+  form.image = event.target.files[0] || null
+}
+
+function onIconChange(event) {
+  form.icon = event.target.files[0] || null
+}
+
 function submit() {
-  form.post('/admin/subcategories')
+  form.post('/admin/subcategories', { forceFormData: true })
 }
 </script>

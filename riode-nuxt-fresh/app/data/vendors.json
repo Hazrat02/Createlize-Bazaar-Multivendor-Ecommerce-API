@@ -1,0 +1,65 @@
+﻿{
+  "items": [
+    {
+      "id": 1,
+      "name": "Vendor1",
+      "banner": "/images/vendor/store/1.jpg",
+      "avatar": "/images/vendor/avatar/1.jpg",
+      "featured": true,
+      "ratingPercent": 87,
+      "location": "Steven Street, El Carjon, California, United States (US)",
+      "phone": "123456789"
+    },
+    {
+      "id": 2,
+      "name": "Vendor2",
+      "banner": "/images/vendor/store/2.jpg",
+      "avatar": "/images/vendor/avatar/2.jpg",
+      "featured": false,
+      "ratingPercent": 87,
+      "location": "London, United Kingdom (UK)",
+      "phone": "123456789"
+    },
+    {
+      "id": 3,
+      "name": "Vendor3",
+      "banner": "/images/vendor/store/3.jpg",
+      "avatar": "/images/vendor/avatar/3.jpg",
+      "featured": false,
+      "ratingPercent": 87,
+      "location": "Berlin, Germany",
+      "phone": "123456789"
+    },
+    {
+      "id": 4,
+      "name": "Vendor4",
+      "banner": "/images/vendor/store/4.jpg",
+      "avatar": "/images/vendor/avatar/4.jpg",
+      "featured": false,
+      "ratingPercent": 87,
+      "location": "Paris, France",
+      "phone": "123456789"
+    },
+    {
+      "id": 5,
+      "name": "Vendor5",
+      "banner": "/images/vendor/store/5.jpg",
+      "avatar": "/images/vendor/avatar/5.jpg",
+      "featured": false,
+      "ratingPercent": 87,
+      "location": "Rome, Italy",
+      "phone": "123456789"
+    },
+    {
+      "id": 6,
+      "name": "Vendor6",
+      "banner": "/images/vendor/store/6.jpg",
+      "avatar": "/images/vendor/avatar/6.jpg",
+      "featured": false,
+      "ratingPercent": 87,
+      "location": "Madrid, Spain",
+      "phone": "123456789"
+    }
+  ]
+}
+

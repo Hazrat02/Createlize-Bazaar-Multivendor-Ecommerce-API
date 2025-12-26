@@ -1,0 +1,21 @@
+﻿{
+  "items": [
+    {
+      "id": 1,
+      "name": "Converse Training Shoes",
+      "href": "/product",
+      "image": "/images/products/product18.jpg",
+      "price": 129.99,
+      "qty": 1
+    },
+    {
+      "id": 2,
+      "name": "Women Beautiful Headgear",
+      "href": "/product",
+      "image": "/images/products/product19.jpg",
+      "price": 98.0,
+      "qty": 1
+    }
+  ]
+}
+

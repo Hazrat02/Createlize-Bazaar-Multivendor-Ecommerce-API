@@ -68,6 +68,9 @@ class ProductAdminController extends Controller
             'stock' => ['nullable','integer','min:0'],
             'sku' => ['nullable','string','max:100'],
             'tags' => ['nullable','string','max:500'],
+            'colors' => ['nullable','string','max:500'],
+            'sizes' => ['nullable','string','max:500'],
+            'plans' => ['nullable','string','max:500'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
             'images' => ['nullable','array'],
@@ -76,7 +79,13 @@ class ProductAdminController extends Controller
 
         $data['slug'] = Str::slug($data['name']).'-'.Str::lower(Str::random(6));
         $data['tags'] = $this->parseTags($data['tags'] ?? null);
-        $data['meta'] = [];
+        $data['meta'] = [
+            'colors' => $this->parseList($data['colors'] ?? null),
+            'sizes' => $this->parseList($data['sizes'] ?? null),
+            'plans' => $this->parseList($data['plans'] ?? null),
+        ];
+
+        unset($data['colors'], $data['sizes'], $data['plans']);
 
         $images = $request->file('images', []);
 
@@ -130,6 +139,9 @@ class ProductAdminController extends Controller
             'stock' => ['nullable','integer','min:0'],
             'sku' => ['nullable','string','max:100'],
             'tags' => ['nullable','string','max:500'],
+            'colors' => ['nullable','string','max:500'],
+            'sizes' => ['nullable','string','max:500'],
+            'plans' => ['nullable','string','max:500'],
             'is_active' => ['boolean'],
             'is_featured' => ['boolean'],
             'images' => ['nullable','array'],
@@ -137,6 +149,12 @@ class ProductAdminController extends Controller
         ]);
 
         $data['tags'] = $this->parseTags($data['tags'] ?? null);
+        $meta = $product->meta ?? [];
+        $meta['colors'] = $this->parseList($data['colors'] ?? null);
+        $meta['sizes'] = $this->parseList($data['sizes'] ?? null);
+        $meta['plans'] = $this->parseList($data['plans'] ?? null);
+        $data['meta'] = $meta;
+        unset($data['colors'], $data['sizes'], $data['plans']);
 
         $product->update($data);
 
@@ -184,6 +202,19 @@ class ProductAdminController extends Controller
 
         return collect(explode(',', $tags))
             ->map(fn($tag) => trim($tag))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function parseList(?string $value): array
+    {
+        if (!$value) {
+            return [];
+        }
+
+        return collect(explode(',', $value))
+            ->map(fn($item) => trim($item))
             ->filter()
             ->values()
             ->all();

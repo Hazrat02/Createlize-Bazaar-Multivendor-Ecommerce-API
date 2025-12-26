@@ -10,6 +10,9 @@
         </div>
         <div class="col-md-6">
           <div class="text-end mb-30">
+            <button type="button" class="main-btn light-btn btn-hover me-2" @click="openGoogleModal">
+              {{ t('google_login_settings') }}
+            </button>
             <Link href="/admin/users/create" class="main-btn primary-btn btn-hover">
               + {{ t('add_user') }}
             </Link>
@@ -115,6 +118,45 @@
 
       <Pagination :links="users.links" />
     </div>
+
+    <div v-if="googleModalOpen" class="modal-backdrop" @click.self="closeGoogleModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h5 class="mb-0">{{ t('google_login_settings') }}</h5>
+          <button type="button" class="btn-close" @click="closeGoogleModal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-check mb-3">
+            <input id="google-enabled" v-model="googleForm.enabled" type="checkbox" class="form-check-input">
+            <label class="form-check-label" for="google-enabled">{{ t('enable_google_login') }}</label>
+          </div>
+          <div class="input-style-1 mb-3">
+            <label>{{ t('google_client_id') }}</label>
+            <input v-model="googleForm.client_id" type="text" class="form-control">
+          </div>
+          <div class="input-style-1 mb-3">
+            <label>{{ t('google_client_secret') }}</label>
+            <input v-model="googleForm.client_secret" type="text" class="form-control">
+          </div>
+          <div class="input-style-1 mb-3">
+            <label>{{ t('google_redirect_url') }}</label>
+            <input v-model="googleForm.redirect_url" type="text" class="form-control">
+          </div>
+          <div class="input-style-1">
+            <label>{{ t('google_frontend_redirect_url') }}</label>
+            <input v-model="googleForm.frontend_redirect_url" type="text" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="main-btn light-btn btn-hover" @click="closeGoogleModal">
+            {{ t('cancel') }}
+          </button>
+          <button type="button" class="main-btn primary-btn btn-hover" @click="saveGoogleSettings">
+            {{ t('save_changes') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </AdminLayout>
 </template>
 
@@ -122,11 +164,12 @@
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import { Link, router, usePage } from '@inertiajs/vue3'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 const props = defineProps({
   users: { type: Object, required: true },
   filters: { type: Object, default: () => ({}) },
+  googleSettings: { type: Object, default: () => ({}) },
 })
 
 const page = usePage()
@@ -139,6 +182,14 @@ function t(key) {
 const q = ref(props.filters?.q || '')
 let searchTimer = null
 const openMenuId = ref(null)
+const googleModalOpen = ref(false)
+const googleForm = reactive({
+  enabled: !!props.googleSettings?.enabled,
+  client_id: props.googleSettings?.client_id || '',
+  client_secret: props.googleSettings?.client_secret || '',
+  redirect_url: props.googleSettings?.redirect_url || '',
+  frontend_redirect_url: props.googleSettings?.frontend_redirect_url || '',
+})
 
 function applySearch() {
   router.get('/admin/users', { q: q.value || undefined }, { preserveState: true, replace: true })
@@ -151,6 +202,25 @@ function clearSearch() {
 
 function toggleMenu(id) {
   openMenuId.value = openMenuId.value === id ? null : id
+}
+
+function openGoogleModal() {
+  googleModalOpen.value = true
+}
+
+function closeGoogleModal() {
+  googleModalOpen.value = false
+}
+
+function saveGoogleSettings() {
+  router.post('/admin/users/google-settings', {
+    enabled: googleForm.enabled,
+    client_id: googleForm.client_id,
+    client_secret: googleForm.client_secret,
+    redirect_url: googleForm.redirect_url,
+    frontend_redirect_url: googleForm.frontend_redirect_url
+  }, { preserveScroll: true })
+  googleModalOpen.value = false
 }
 
 function handleDocumentClick() {
@@ -206,5 +276,43 @@ watch(q, (value) => {
   left: auto;
   margin: 0;
   z-index: 1060;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-card {
+  background: #fff;
+  width: 100%;
+  max-width: 560px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modal-header,
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-footer {
+  border-top: 1px solid #eee;
+  border-bottom: none;
+  gap: 12px;
+}
+
+.modal-body {
+  padding: 20px;
 }
 </style>

@@ -27,6 +27,20 @@
                 <div v-if="form.errors.name" class="text-danger text-sm mt-1">{{ form.errors.name }}</div>
               </div>
             </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('category_image') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onImageChange" />
+                <div v-if="form.errors.image" class="text-danger text-sm mt-1">{{ form.errors.image }}</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-style-1">
+                <label>{{ t('category_icon') }}</label>
+                <input type="file" class="form-control" accept="image/*" @change="onIconChange" />
+                <div v-if="form.errors.icon" class="text-danger text-sm mt-1">{{ form.errors.icon }}</div>
+              </div>
+            </div>
             <div class="col-12">
               <button type="submit" class="main-btn primary-btn btn-hover" :disabled="form.processing">
                 {{ form.processing ? t('saving') : t('create') }}
@@ -53,9 +67,19 @@ function t(key) {
 
 const form = useForm({
   name: '',
+  image: null,
+  icon: null,
 })
 
+function onImageChange(event) {
+  form.image = event.target.files[0] || null
+}
+
+function onIconChange(event) {
+  form.icon = event.target.files[0] || null
+}
+
 function submit() {
-  form.post('/admin/categories')
+  form.post('/admin/categories', { forceFormData: true })
 }
 </script>

@@ -7,7 +7,16 @@
     <aside class="sidebar-nav-wrapper" :class="{ active: sidebarOpen }">
       <div class="navbar-logo">
         <Link href="/">
-          <img src="@/../admin/assets/images/logo/logo.svg" alt="logo" />
+                <div class="brand-logo d-none d-lg-flex align-items-center">
+                  <img
+                    v-if="siteLogo"
+                    :src="siteLogo"
+                    :alt="siteName || 'Site logo'"
+                    :class="{ wide: !!siteLogoWide }"
+                  />
+                  <span class="brand-name">{{ siteName || 'Createlize' }}</span>
+                </div>
+          <!-- <img src="@/../admin/assets/images/logo/logo.svg" alt="logo" /> -->
         </Link>
       </div>
       <nav class="sidebar-nav">
@@ -162,6 +171,7 @@
           <div class="row">
             <div class="col-lg-5 col-md-5 col-6">
               <div class="header-left d-flex align-items-center">
+               
                 <div class="menu-toggle-btn mr-15">
                   <button type="button" class="main-btn primary-btn btn-hover" @click="sidebarOpen = !sidebarOpen">
                     <i class="lni lni-chevron-left me-2"></i> {{ t('menu') }}
@@ -262,6 +272,12 @@
                     </li>
                     <li class="divider"></li>
                     <li>
+                      <Link href="/admin/profile">
+                        <i class="lni lni-user"></i> Profile
+                      </Link>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
                       <Link href="/admin/settings">
                         <i class="lni lni-cog"></i> {{ t('settings') }}
                       </Link>
@@ -327,6 +343,19 @@ import { Link, router, usePage } from '@inertiajs/vue3'
 
 const page = usePage()
 const user = computed(() => page.props.auth?.user)
+const siteName = computed(() => page.props.site?.name || '')
+const siteLogo = computed(() => {
+  const logo = page.props.site?.logo
+  if (!logo) return ''
+  if (logo.startsWith('http')) return logo
+  return `/storage/${logo}`
+})
+const siteLogoWide = computed(() => {
+  const logo = page.props.site?.logo_wide
+  if (!logo) return ''
+  if (logo.startsWith('http')) return logo
+  return `/storage/${logo}`
+})
 const csrf = computed(() => page.props.csrf_token || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '')
 const locale = computed(() => page.props.i18n?.locale || 'en')
 const messages = computed(() => page.props.i18n?.admin || {})
@@ -391,6 +420,26 @@ watch(
   gap: 6px;
 }
 
+.brand-logo {
+  margin-right: 16px;
+  gap: 10px;
+}
+
+.brand-logo img {
+  height: 32px;
+  width: auto;
+}
+
+.brand-logo img.wide {
+  height: 30px;
+  max-width: 140px;
+}
+
+.brand-name {
+  font-weight: 600;
+  color: #1a2142;
+}
+
 /* .active {
   color: #1A2142;
   background: rgba(223, 229, 239, 0.3);
@@ -401,7 +450,3 @@ watch(
   
  }
 </style>
-
-
-
-

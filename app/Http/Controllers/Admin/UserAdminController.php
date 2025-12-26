@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\Settings\SettingsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -30,6 +31,7 @@ class UserAdminController extends Controller
         return Inertia::render('Admin/Users/Index', [
             'users' => $query->paginate(20)->withQueryString(),
             'filters' => $request->only('q'),
+            'googleSettings' => $this->googleSettings(),
         ]);
     }
 
@@ -187,5 +189,40 @@ class UserAdminController extends Controller
         });
 
         return back()->with('success', 'Email sent');
+    }
+
+    public function updateGoogleSettings(Request $request, SettingsService $settingsService): RedirectResponse
+    {
+        $data = $request->validate([
+            'enabled' => ['nullable', 'boolean'],
+            'client_id' => ['nullable', 'string', 'max:255'],
+            'client_secret' => ['nullable', 'string', 'max:255'],
+            'redirect_url' => ['nullable', 'url', 'max:500'],
+            'frontend_redirect_url' => ['nullable', 'url', 'max:500'],
+        ]);
+
+        $settingsService->set('auth_google', 'enabled', (bool)($data['enabled'] ?? false));
+        $settingsService->set('auth_google', 'client_id', $data['client_id'] ?? '');
+        $settingsService->set('auth_google', 'client_secret', $data['client_secret'] ?? '');
+        $settingsService->set('auth_google', 'redirect_url', $data['redirect_url'] ?? route('api.v2.auth.google.callback'));
+        $settingsService->set('auth_google', 'frontend_redirect_url', $data['frontend_redirect_url'] ?? config('app.url'));
+
+        return back()->with('success', 'Google login settings saved');
+    }
+
+    private function googleSettings(): array
+    {
+        $settings = Setting::query()
+            ->where('group', 'auth_google')
+            ->pluck('value', 'key')
+            ->toArray();
+
+        return [
+            'enabled' => (bool)($settings['enabled'] ?? false),
+            'client_id' => (string)($settings['client_id'] ?? ''),
+            'client_secret' => (string)($settings['client_secret'] ?? ''),
+            'redirect_url' => (string)($settings['redirect_url'] ?? route('api.v2.auth.google.callback')),
+            'frontend_redirect_url' => (string)($settings['frontend_redirect_url'] ?? config('app.url')),
+        ];
     }
 }

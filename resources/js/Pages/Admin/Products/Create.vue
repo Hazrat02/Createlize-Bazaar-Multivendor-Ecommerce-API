@@ -198,6 +198,39 @@
                   />
                 <div v-if="showErrors && form.errors.tags" class="text-danger text-sm mt-1">{{ form.errors.tags }}</div>
                 </div>
+                <div class="input-style-1">
+                  <label>Colors</label>
+                  <input
+                    v-model="form.colors"
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. Red, Blue"
+                    @input="clearError('colors')"
+                  />
+                  <div v-if="showErrors && form.errors.colors" class="text-danger text-sm mt-1">{{ form.errors.colors }}</div>
+                </div>
+                <div class="input-style-1">
+                  <label>Sizes</label>
+                  <input
+                    v-model="form.sizes"
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. S, M, L"
+                    @input="clearError('sizes')"
+                  />
+                  <div v-if="showErrors && form.errors.sizes" class="text-danger text-sm mt-1">{{ form.errors.sizes }}</div>
+                </div>
+                <div class="input-style-1">
+                  <label>Plans</label>
+                  <input
+                    v-model="form.plans"
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. 1 month, 3 months, 12 months"
+                    @input="clearError('plans')"
+                  />
+                  <div v-if="showErrors && form.errors.plans" class="text-danger text-sm mt-1">{{ form.errors.plans }}</div>
+                </div>
               <div class="form-check mt-3">
                 <input id="is_active" v-model="form.is_active" class="form-check-input" type="checkbox" />
                 <label class="form-check-label" for="is_active">Active</label>
@@ -243,6 +276,9 @@ const form = useForm({
   stock: null,
   sku: '',
   tags: '',
+  colors: '',
+  sizes: '',
+  plans: '',
   is_active: true,
   is_featured: false,
   images: [],

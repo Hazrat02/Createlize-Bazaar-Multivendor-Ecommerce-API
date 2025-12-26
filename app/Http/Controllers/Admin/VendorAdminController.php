@@ -9,6 +9,7 @@ use App\Models\VendorTransaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -64,6 +65,7 @@ class VendorAdminController extends Controller
             'balance' => ['nullable', 'numeric', 'min:0'],
             'payout_info' => ['nullable', 'json'],
             'documents' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'max:4096'],
         ]);
 
         $user = User::findOrFail($data['user_id']);
@@ -72,7 +74,9 @@ class VendorAdminController extends Controller
             return back()->with('error', 'User is already a vendor.');
         }
 
-        DB::transaction(function () use ($user, $data) {
+        $logoPath = $request->file('logo')?->store('vendors', 'public');
+
+        DB::transaction(function () use ($user, $data, $logoPath) {
             $user->assignRole('Vendor');
 
             VendorProfile::create([
@@ -84,6 +88,7 @@ class VendorAdminController extends Controller
                 'balance' => $data['balance'] ?? 0,
                 'payout_info' => $data['payout_info'] ? json_decode($data['payout_info'], true) : null,
                 'documents' => $this->normalizeDocuments($data['documents'] ?? null),
+                'logo_path' => $logoPath,
             ]);
         });
 
@@ -140,12 +145,21 @@ class VendorAdminController extends Controller
             'balance' => ['nullable', 'numeric', 'min:0'],
             'payout_info' => ['nullable', 'json'],
             'documents' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'max:4096'],
         ]);
 
         $profile = $user->vendorProfile;
 
         if (!$profile) {
             return back()->with('error', 'Vendor profile not found.');
+        }
+
+        $logoPath = $profile->logo_path;
+        if ($request->hasFile('logo')) {
+            if ($logoPath) {
+                Storage::disk('public')->delete($logoPath);
+            }
+            $logoPath = $request->file('logo')->store('vendors', 'public');
         }
 
         $profile->update([
@@ -156,6 +170,7 @@ class VendorAdminController extends Controller
             'balance' => $data['balance'] ?? $profile->balance,
             'payout_info' => $data['payout_info'] ? json_decode($data['payout_info'], true) : null,
             'documents' => $this->normalizeDocuments($data['documents'] ?? null),
+            'logo_path' => $logoPath,
         ]);
 
         return back()->with('success', 'Vendor profile updated');

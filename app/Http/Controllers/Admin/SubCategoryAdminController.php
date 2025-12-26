@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\SubCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -45,13 +46,20 @@ class SubCategoryAdminController extends Controller
             'category_id' => ['required','exists:categories,id'],
             'name' => ['required','string','max:150'],
             'is_active' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'icon' => ['nullable', 'image', 'max:4096'],
         ]);
+
+        $imagePath = $request->file('image')?->store('subcategories', 'public');
+        $iconPath = $request->file('icon')?->store('subcategories', 'public');
 
         SubCategory::create([
             'category_id' => $data['category_id'],
             'name' => $data['name'],
             'slug' => Str::slug($data['name']).'-'.Str::lower(Str::random(6)),
             'is_active' => $data['is_active'] ?? true,
+            'image_path' => $imagePath,
+            'icon_path' => $iconPath,
         ]);
 
         return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory created');
@@ -71,12 +79,32 @@ class SubCategoryAdminController extends Controller
             'category_id' => ['required','exists:categories,id'],
             'name' => ['required','string','max:150'],
             'is_active' => ['nullable', 'boolean'],
+            'image' => ['nullable', 'image', 'max:4096'],
+            'icon' => ['nullable', 'image', 'max:4096'],
         ]);
+
+        $imagePath = $subcategory->image_path;
+        if ($request->hasFile('image')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $imagePath = $request->file('image')->store('subcategories', 'public');
+        }
+
+        $iconPath = $subcategory->icon_path;
+        if ($request->hasFile('icon')) {
+            if ($iconPath) {
+                Storage::disk('public')->delete($iconPath);
+            }
+            $iconPath = $request->file('icon')->store('subcategories', 'public');
+        }
 
         $subcategory->update([
             'category_id' => $data['category_id'],
             'name' => $data['name'],
             'is_active' => $data['is_active'] ?? $subcategory->is_active,
+            'image_path' => $imagePath,
+            'icon_path' => $iconPath,
         ]);
 
         return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory updated');
@@ -84,6 +112,12 @@ class SubCategoryAdminController extends Controller
 
     public function destroy(SubCategory $subcategory): RedirectResponse
     {
+        if ($subcategory->image_path) {
+            Storage::disk('public')->delete($subcategory->image_path);
+        }
+        if ($subcategory->icon_path) {
+            Storage::disk('public')->delete($subcategory->icon_path);
+        }
         $subcategory->delete();
         return redirect()->route('admin.subcategories.index')->with('success', 'Subcategory deleted');
     }
