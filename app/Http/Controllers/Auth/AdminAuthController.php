@@ -23,18 +23,18 @@ class AdminAuthController extends Controller
             'password' => ['required','string'],
         ]);
 
-        if (!Auth::guard('admin')->attempt($credentials, true)) {
+        if (!Auth::attempt($credentials, true)) {
             return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
         }
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/admin/dashboard');
+        return redirect()->intended('/');
     }
 
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('admin')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('admin.login');

@@ -28,11 +28,11 @@ class AuthController extends Controller
         ]);
 
         $user->assignRole('Customer');
-        Auth::login($user);
-        $request->session()->regenerate();
+        $token = $user->createToken('api')->plainTextToken;
 
         return response()->json([
             'user' => $this->presentUser($user),
+            'token' => $token,
         ], 201);
     }
 
@@ -49,19 +49,17 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['email' => 'Account is banned.']);
         }
 
-        Auth::login($user, (bool)($data['remember'] ?? false));
-        $request->session()->regenerate();
+        $token = $user->createToken('api')->plainTextToken;
 
         return response()->json([
             'user' => $this->presentUser($user),
+            'token' => $token,
         ]);
     }
 
     public function logout(Request $request)
     {
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->user()?->currentAccessToken()?->delete();
 
         return response()->json(['ok' => true]);
     }
@@ -185,10 +183,12 @@ class AuthController extends Controller
             return redirect()->away($this->googleFrontendRedirect($settings, 'Account is banned.'));
         }
 
-        Auth::login($user, true);
-        $request->session()->regenerate();
+        // Issue token for SPA use
+        $token = $user->createToken('api')->plainTextToken;
+        $redirectUrl = $this->googleFrontendRedirect($settings);
+        $separator = str_contains($redirectUrl, '?') ? '&' : '?';
 
-        return redirect()->away($this->googleFrontendRedirect($settings));
+        return redirect()->away($redirectUrl . $separator . 'token=' . urlencode($token));
     }
 
     private function presentUser(User $user): array

@@ -160,7 +160,7 @@
 </template>
 
 <script setup>
-const { user, ensureLoggedIn, openLoginModal, logout, fetchUser } = useAuth()
+const { user, token, ensureLoggedIn, openLoginModal, logout, fetchUser } = useAuth()
 const config = useRuntimeConfig()
 const orders = ref([])
 const ordersLoading = ref(false)
@@ -169,7 +169,7 @@ const loadOrders = async () => {
   ordersLoading.value = true
   try {
     const response = await $fetch(`${config.public.apiBase}/orders`, {
-      credentials: 'include'
+      headers: token.value ? { Authorization: `Bearer ${token.value}` } : {}
     })
     orders.value = response?.data ?? []
   } catch (error) {
@@ -213,7 +213,8 @@ useHead({
   bodyAttrs: {}
 })
 definePageMeta({
-  layout: 'riode'
+  layout: 'riode',
+  requiresAuth: true
 })
 </script>
 

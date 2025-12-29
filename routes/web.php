@@ -24,13 +24,17 @@ use App\Http\Controllers\Admin\ProfileAdminController;
 
 // Route::get('/', fn() => redirect()->route('admin.dashboard'));
 // Secure download routes (signed)
-Route::middleware('auth','role:Admin')->get('/', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['guest'])->get('/login', function () {
+    return redirect('/admin/login');
+})->name('login');
 
-Route::get('/admin/login', [AdminAuthController::class, 'create'])->middleware('admin')->name('admin.login');
-Route::post('/admin/login', [AdminAuthController::class, 'store'])->middleware('admin')->name('admin.login.store');
-Route::post('/admin/logout', [AdminAuthController::class, 'destroy'])->middleware(['admin','auth:admin'])->name('admin.logout');
+Route::middleware(['auth','role:Admin'])->get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::middleware(['admin','auth:admin', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::get('/admin/login', [AdminAuthController::class, 'create'])->name('admin.login');
+Route::post('/admin/login', [AdminAuthController::class, 'store'])->name('admin.login.store');
+Route::post('/admin/logout', [AdminAuthController::class, 'destroy'])->middleware('auth')->name('admin.logout');
+
+Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('locale', function () {
         return redirect('/');
     })->name('locale.show');
