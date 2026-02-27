@@ -38,11 +38,16 @@
                             </div>
                             <div class="cart-coupon-box mb-8">
                                 <h4 class="title coupon-title text-uppercase ls-m">Coupon Discount</h4>
-                                <input type="text" name="coupon_code"
-                                    class="input-text form-control text-grey ls-m mb-4" id="coupon_code" value=""
+                                <input v-model="couponCode" type="text" name="coupon_code"
+                                    class="input-text form-control text-grey ls-m mb-4" id="coupon_code"
                                     placeholder="Enter coupon code here...">
-                                <button type="submit" class="btn btn-md btn-dark btn-rounded btn-outline">Apply
-                                    Coupon</button>
+                                <button type="button" class="btn btn-md btn-dark btn-rounded btn-outline"
+                                    :disabled="couponLoading" @click.prevent="applyCoupon">
+                                    {{ couponLoading ? 'Applying...' : 'Apply Coupon' }}
+                                </button>
+                                <p v-if="couponMessage" :class="couponSuccess ? 'text-success mt-3 mb-0' : 'text-danger mt-3 mb-0'">
+                                  {{ couponMessage }}
+                                </p>
                             </div>
                         </div>
                         <aside class="col-lg-4 sticky-sidebar-wrapper">
@@ -57,6 +62,14 @@
                                                 </td>
                                                 <td>
                                                     <p class="summary-subtotal-price">{{ formatPrice(cartSubtotal) }}</p>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="discountAmount > 0" class="summary-subtotal">
+                                                <td>
+                                                    <h4 class="summary-subtitle">Discount</h4>
+                                                </td>
+                                                <td>
+                                                    <p class="summary-subtotal-price">-{{ formatPrice(discountAmount) }}</p>
                                                 </td>
                                             </tr>
                                             <tr class="sumnary-shipping shipping-row-last">
@@ -123,7 +136,7 @@
                                                     <h4 class="summary-subtitle">Total</h4>
                                                 </td>
                                                 <td>
-                                                    <p class="summary-total-price ls-s">{{ formatPrice(cartSubtotal) }}</p>
+                                                    <p class="summary-total-price ls-s">{{ formatPrice(cartTotal) }}</p>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -144,6 +157,81 @@
 import CartRow from '~/components/CartRow.vue'
 
 const { cart, cartSubtotal, updateQty, removeItem } = useCart()
+const config = useRuntimeConfig()
+const couponCode = ref('')
+const couponLoading = ref(false)
+const couponMessage = ref('')
+const couponSuccess = ref(false)
+const discountAmount = ref(0)
+const cartSynced = ref(false)
+const cartTotal = computed(() => Math.max(cartSubtotal.value - discountAmount.value, 0))
+
+const syncCartToServer = async () => {
+  if (cartSynced.value) return
+
+  await $fetch(`${config.public.apiBase}/cart/clear`, {
+    method: 'POST',
+    credentials: 'include'
+  })
+
+  for (const item of cart.value) {
+    await $fetch(`${config.public.apiBase}/cart/add`, {
+      method: 'POST',
+      credentials: 'include',
+      body: {
+        product_id: item.id,
+        qty: item.qty
+      }
+    })
+  }
+
+  cartSynced.value = true
+}
+
+const applyCoupon = async () => {
+  if (!couponCode.value.trim()) {
+    couponSuccess.value = false
+    couponMessage.value = 'Please enter a coupon code.'
+    return
+  }
+
+  couponLoading.value = true
+  couponMessage.value = ''
+
+  try {
+    await syncCartToServer()
+    const response = await $fetch(`${config.public.apiBase}/coupons/validate`, {
+      method: 'POST',
+      credentials: 'include',
+      body: {
+        coupon_code: couponCode.value.trim(),
+        payment_type: 'online'
+      }
+    })
+
+    discountAmount.value = Number(response?.discount_amount || 0)
+    couponSuccess.value = true
+    couponMessage.value = 'Coupon applied successfully.'
+  } catch (error) {
+    discountAmount.value = 0
+    couponSuccess.value = false
+    couponMessage.value = 'Invalid coupon code.'
+  } finally {
+    couponLoading.value = false
+  }
+}
+
+watch(
+  cart,
+  () => {
+    cartSynced.value = false
+    discountAmount.value = 0
+    couponMessage.value = ''
+    couponSuccess.value = false
+  },
+  { deep: true }
+)
+
 const formatPrice = (value) => `$${(Number(value) || 0).toFixed(2)}`
 useHead({
   bodyAttrs: { class: '' }

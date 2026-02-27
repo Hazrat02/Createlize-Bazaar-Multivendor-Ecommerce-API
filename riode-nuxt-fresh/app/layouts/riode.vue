@@ -270,166 +270,18 @@
                 <li>
                   <NuxtLink to="/">Home</NuxtLink>
                 </li>
-                <li>
-                  <NuxtLink to="/compare">Compare</NuxtLink>
-                </li>
+
                 <li>
                   <NuxtLink to="/shop">Categories</NuxtLink>
-                  <div class="megamenu">
-                    <div class="row">
-                      <div class="col-6 col-sm-4 col-md-4 col-lg-3">
-                        <h4 class="menu-title">Variations 1</h4>
-                        <ul>
-                          <li><a href="#">Classic Filter</a></li>
-                          <li><a href="#">Left Toggle Filter</a></li>
-                          <li><a href="#">Right Toggle Sidebar</a></li>
-                          <li><a href="#">Horizontal Filter </a></li>
-                          <li><a href="#">Navigation Filter</a></li>
+                  <ul>
+                    <li v-for="item in menuCategories" :key="item.id">
+                      <NuxtLink :to="{ path: '/market-shop', query: { category: item.slug } }">
+                        {{ item.name }}
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </li>
 
-                          <li><a href="#">Off-Canvas Filter </a></li>
-                          <li><a href="#">Top Banner</a></li>
-                          <li><a href="#">Inner Top Banner</a></li>
-                          <li><a href="#">With Bottom Block</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-6 col-sm-4 col-md-4 col-lg-3">
-                        <h4 class="menu-title">Variations 2</h4>
-                        <ul>
-                          <li><a href="#">3 Columns Mode</a></li>
-                          <li><a href="#">4 Columns Mode</a></li>
-                          <li><a href="#">5 Columns Mode</a></li>
-                          <li><a href="#">6 Columns Mode</a></li>
-                          <li><a href="#">7 Columns Mode</a></li>
-                          <li><a href="#">8 Columns Mode</a></li>
-                          <li><a href="#">List Mode</a></li>
-                          <li><a href="#">Pagination</a></li>
-                          <li><a href="#">Infinite Ajaxscroll </a></li>
-                          <li><a href="#">Loadmore Button</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-6 col-sm-4 col-md-4 col-lg-3">
-                        <h4 class="menu-title">Variations 3</h4>
-                        <ul>
-                          <li><a href="#">Category Grid Shop</a></li>
-                          <li><a href="#">Category + Products</a></li>
-                          <li><a href="#">Shop Default 1 </a></li>
-                          <li><a href="#">Shop Default 2</a></li>
-                          <li><a href="#">Shop Default 3</a></li>
-                          <li><a href="#">Shop Default 4</a></li>
-                          <li><a href="#">Shop Default 5</a></li>
-                          <li><a href="#">Shop Default 6</a></li>
-                          <li><a href="#">Shop Default 7</a></li>
-                          <li><a href="#">Shop Default 8</a></li>
-                        </ul>
-                      </div>
-                      <div
-                        class="col-6 col-sm-4 col-md-4 col-lg-3 menu-banner menu-banner1 banner banner-fixed"
-                      >
-                        <figure>
-                          <img
-                            src="/images/menu/banner-1.jpg"
-                            alt="Menu banner"
-                            width="221"
-                            height="330"
-                          />
-                        </figure>
-                        <div class="banner-content y-50">
-                          <h4
-                            class="banner-subtitle font-weight-bold text-primary ls-m"
-                          >
-                            Sale.
-                          </h4>
-                          <h3 class="banner-title font-weight-bold">
-                            <span class="text-uppercase">Up to</span>70% Off
-                          </h3>
-                          <NuxtLink
-                            to="/shop"
-                            class="btn btn-link btn-underline"
-                            >shop now<i class="d-icon-arrow-right"></i
-                          ></NuxtLink>
-                        </div>
-                      </div>
-                      <!-- End Megamenu -->
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <NuxtLink to="/product">Products</NuxtLink>
-                  <div class="megamenu">
-                    <div class="row">
-                      <div class="col-6 col-sm-4 col-md-3">
-                        <h4 class="menu-title">Product Pages</h4>
-                        <ul>
-                          <li><a href="#">Simple Product</a></li>
-                          <li><a href="#">Featured &amp; On Sale</a></li>
-                          <li>
-                            <NuxtLink to="/product">Variable Product</NuxtLink>
-                          </li>
-                          <li><a href="#">Variation Swatch Product</a></li>
-                          <li><a href="#">Grouped Product </a></li>
-                          <li><a href="#">External Product</a></li>
-                          <li><a href="#">In Stock Product</a></li>
-                          <li><a href="#">Out of Stock Product</a></li>
-                          <li><a href="#">Upsell Products</a></li>
-                          <li><a href="#">Cross Sell Products</a></li>
-                        </ul>
-                      </div>
-                      <div class="col-6 col-sm-4 col-md-3">
-                        <h4 class="menu-title">Product Layouts</h4>
-                        <ul>
-                          <li><a href="#">Vertical Thumb</a></li>
-                          <li><a href="#">Horizontal Thumb</a></li>
-                          <li><a href="#">Gallery Type</a></li>
-                          <li><a href="#">Grid Images</a></li>
-                          <li><a href="#">Masonry Images</a></li>
-                          <li><a href="#">Sticky Info</a></li>
-                          <li><a href="#">Left & Right Sticky</a></li>
-                          <li><a href="#">With Left Sidebar</a></li>
-                          <li><a href="#">With Right Sidebar</a></li>
-                          <li><a href="#">Full Width Layout </a></li>
-                        </ul>
-                      </div>
-                      <div class="col-6 col-sm-4 col-md-3">
-                        <h4 class="menu-title">Product Features</h4>
-                        <ul>
-                          <li><a href="#">Sale Countdown</a></li>
-                          <li><a href="#">Hurry Up Notification </a></li>
-                          <li><a href="#">Attribute Guide </a></li>
-                          <li><a href="#">Add Cart Sticky</a></li>
-                          <li><a href="#">Labels on Thumbnail</a></li>
-                          <li><a href="#">More Description Tabs</a></li>
-                          <li><a href="#">Data In Accordion</a></li>
-                          <li><a href="#">Data Inside</a></li>
-                          <li><a href="#">Video Thumbnail </a></li>
-                          <li><a href="#">360 Degree Thumbnail </a></li>
-                        </ul>
-                      </div>
-                      <div
-                        class="col-6 col-sm-4 col-md-3 menu-banner menu-banner2 banner banner-fixed"
-                      >
-                        <figure>
-                          <img
-                            src="/images/menu/banner-2.jpg"
-                            alt="Menu banner"
-                            width="221"
-                            height="330"
-                          />
-                        </figure>
-                        <div class="banner-content x-50 text-center">
-                          <h3 class="banner-title text-white text-uppercase">
-                            Sunglasses
-                          </h3>
-                          <h4
-                            class="banner-subtitle font-weight-bold text-white mb-0"
-                          >
-                            $23.00 - $120.00
-                          </h4>
-                        </div>
-                      </div>
-                      <!-- End MegaMenu -->
-                    </div>
-                  </div>
-                </li>
                 <li class="active">
                   <a href="#">Pages</a>
                   <ul>
@@ -1138,8 +990,14 @@
 <script setup>
 const { cart, cartCount, cartSubtotal, removeItem } = useCart()
 const { settings } = useSiteSettings()
+const { categories } = useCategories()
 const router = useRouter()
 const searchInput = ref('')
+const menuCategories = computed(() =>
+  (categories.value || [])
+    .filter((item) => item?.slug)
+    .slice(0, 7)
+)
 const siteName = computed(() => settings.value.site_name || 'Riode')
 const siteLogoWide = computed(
   () => settings.value.site_logo_wide_url || settings.value.site_logo_url || '/images/logo.png'
@@ -1160,7 +1018,6 @@ const submitSearch = () => {
   })
 }
 </script>
-
 
 
 

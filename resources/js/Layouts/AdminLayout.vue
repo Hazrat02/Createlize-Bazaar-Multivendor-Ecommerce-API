@@ -89,6 +89,13 @@
             </Link>
           </li>
 
+          <li class="nav-item">
+            <Link href="/admin/banners" :class="{ active: isActive('/admin/banners') }">
+              <span class="icon"><i class="lni lni-image"></i></span>
+              <span class="text">{{ t('banners') }}</span>
+            </Link>
+          </li>
+
           <li class="nav-item nav-item-has-children">
             <a href="#" @click.prevent="toggleMenu('content')" :aria-expanded="menuOpen.content ? 'true' : 'false'">
               <span class="icon"><i class="lni lni-write"></i></span>

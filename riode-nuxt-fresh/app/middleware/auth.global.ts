@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   // Protect routes that explicitly require auth
-  if (to.meta.requiresAuth && !user.value) {
-    return navigateTo('/')
-  }
+  // if (to.meta.requiresAuth && !user.value) {
+  //   return navigateTo('/')
+  // }
 })

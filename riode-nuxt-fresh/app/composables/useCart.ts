@@ -81,7 +81,12 @@ export const useCart = () => {
     showPopup(item, safeQty)
   }
 
-  const updateQty = (id: number, qty: number) => {
+  const updateQty = (
+    idOrPayload: number | { id: number; qty: number },
+    qtyArg?: number
+  ) => {
+    const id = typeof idOrPayload === 'object' ? Number(idOrPayload.id) : Number(idOrPayload)
+    const qty = typeof idOrPayload === 'object' ? Number(idOrPayload.qty) : Number(qtyArg)
     const target = cart.value.find((item) => item.id === id)
     if (!target) return
     const next = Number(qty)

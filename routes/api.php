@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V2\ProductController as ProductControllerV2;
 use App\Http\Controllers\Api\V2\CategoryController as CategoryControllerV2;
 use App\Http\Controllers\Api\V2\VendorController as VendorControllerV2;
 use App\Http\Controllers\Api\V2\SettingController as SettingControllerV2;
+use App\Http\Controllers\Api\V2\HomeController as HomeControllerV2;
 use App\Http\Controllers\Api\V2\CartController as CartControllerV2;
 use App\Http\Controllers\Api\V2\CheckoutController as CheckoutControllerV2;
 use App\Http\Controllers\Api\V2\CouponController as CouponControllerV2;
@@ -89,6 +90,7 @@ Route::prefix('v2')->group(function () {
     Route::get('/categories', [CategoryControllerV2::class, 'index']);
     Route::get('/categories/{slug}/subcategories', [CategoryControllerV2::class, 'subcategories']);
     Route::get('/vendors/top-weekly', [VendorControllerV2::class, 'topWeekly']);
+    Route::get('/homepage', [HomeControllerV2::class, 'index']);
     Route::get('/settings', [SettingControllerV2::class, 'general']);
     Route::post('/cart/add', [CartControllerV2::class, 'add']);
     Route::get('/cart', [CartControllerV2::class, 'get']);

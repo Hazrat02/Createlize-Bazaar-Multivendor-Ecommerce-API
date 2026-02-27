@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\Admin\CouponAdminController;
 use App\Http\Controllers\Admin\ContentAdminController;
+use App\Http\Controllers\Admin\BannerAdminController;
 use App\Http\Controllers\Admin\PaymentAdminController;
 use App\Http\Controllers\Admin\SmtpAdminController;
 use App\Http\Controllers\Admin\InvoiceAdminController;
@@ -97,6 +98,7 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
     Route::get('orders/{order}/invoice', [OrderAdminController::class, 'invoice'])->name('orders.invoice');
 
     Route::resource('coupons', CouponAdminController::class);
+    Route::resource('banners', BannerAdminController::class);
 
     Route::get('content', [ContentAdminController::class, 'index'])->name('content.index');
     Route::post('content/pages', [ContentAdminController::class, 'savePages'])->name('content.pages.save');

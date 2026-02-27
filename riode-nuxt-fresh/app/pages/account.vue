@@ -204,6 +204,7 @@ onMounted(async () => {
   const loggedIn = await ensureLoggedIn()
   if (!loggedIn) {
     openLoginModal('login')
+    await navigateTo('/')
     return
   }
   await loadOrders()

@@ -111,8 +111,11 @@ const {
   openLoginModal,
   closeLoginModal,
   startGoogleLogin,
+  applyAuthToken,
   fetchUser
 } = useAuth()
+const route = useRoute()
+const router = useRouter()
 const faviconUrl = computed(() => settings.value.site_logo_url || '/images/icons/favicon.png')
 const siteTitle = computed(() => settings.value.site_name || 'Riode')
 
@@ -161,6 +164,7 @@ const submitLogin = async () => {
       remember: loginForm.remember
     })
     closeLoginModal()
+    await router.push('/account')
   } catch (error) {
     loginError.value = 'Login failed. Please check your credentials.'
   } finally {
@@ -183,6 +187,7 @@ const submitRegister = async () => {
       password: registerForm.password
     })
     closeLoginModal()
+    await router.push('/account')
   } catch (error) {
     registerError.value = 'Registration failed. Please try again.'
   } finally {
@@ -205,9 +210,23 @@ const handleKeydown = (event) => {
   }
 }
 
-onMounted(() => {
+const consumeAuthQuery = async () => {
+  if (!route.query.token) return false
+  const applied = await applyAuthToken(route.query.token)
+  if (!applied) return false
+  const nextQuery = { ...route.query }
+  delete nextQuery.token
+  await router.replace({ path: route.path, query: nextQuery })
+  await router.push('/account')
+  return true
+}
+
+onMounted(async () => {
   void refreshSettings()
-  void fetchUser()
+  const applied = await consumeAuthQuery()
+  if (!applied) {
+    void fetchUser()
+  }
   document.addEventListener('click', handleLoginToggleClick)
   document.addEventListener('keydown', handleKeydown)
 })

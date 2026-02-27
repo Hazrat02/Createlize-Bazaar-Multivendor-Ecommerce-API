@@ -147,6 +147,15 @@ export const useAuth = () => {
     window.location.href = `${apiBase}/auth/google/redirect`
   }
 
+  const applyAuthToken = async (rawToken?: string | string[] | null) => {
+    if (process.server) return false
+    const nextToken = Array.isArray(rawToken) ? rawToken[0] : rawToken
+    if (!nextToken) return false
+    setToken(nextToken)
+    await fetchUser()
+    return true
+  }
+
   return {
     user,
     userLoaded,
@@ -160,6 +169,7 @@ export const useAuth = () => {
     register,
     logout,
     ensureLoggedIn,
-    startGoogleLogin
+    startGoogleLogin,
+    applyAuthToken
   }
 }

@@ -1,390 +1,51 @@
 <template>
-  <div>
-
-    <div class="page-wrapper">
-        <h1 class="d-none">{{ siteName }} - Responsive eCommerce HTML Template</h1>
-        <header class="header">
-            <div class="header-top">
-                <div class="container">
-                    <div class="header-left">
-                        <p class="welcome-msg ls-normal">Welcome to {{ siteName }} store message or remove it!</p>
-                    </div>
-                    <div class="header-right">
-                        <div class="dropdown">
-                            <a href="#currency">USD</a>
-                            <ul class="dropdown-box">
-                                <li><a href="#USD">USD</a></li>
-                                <li><a href="#EUR">EUR</a></li>
-                            </ul>
-                        </div>
-                        <!-- End DropDown Menu -->
-                        <div class="dropdown ml-5">
-                            <a href="#language">ENG</a>
-                            <ul class="dropdown-box">
-                                <li>
-                                    <a href="#USD">ENG</a>
-                                </li>
-                                <li>
-                                    <a href="#EUR">FRH</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <!-- End DropDown Menu -->
-                        <span class="divider"></span>
-                        <NuxtLink to="/store-listing" class="contact d-lg-show"><i class="d-icon-map"></i>Vendors</NuxtLink>
-                        <a href="#" class="help d-lg-show"><i class="d-icon-info"></i> My Account</a>
-                        <a class="login-link" href="#" data-toggle="login-modal"><i
-                                class="d-icon-user"></i>Sign in</a>
-                        <span class="delimiter">/</span>
-                        <a class="register-link ml-0" href="#" data-toggle="login-modal">Register</a>
-                        <!-- End of Login -->
-                    </div>
-                </div>
-            </div>
-            <!-- End HeaderTop -->
-            <div class="header-middle sticky-header fix-top sticky-content">
-                <div class="container">
-                    <div class="header-left mr-4">
-                        <a href="#" class="mobile-menu-toggle">
-                            <i class="d-icon-bars2"></i>
-                        </a>
-                        <NuxtLink to="/" class="logo">
-                            <img :src="siteLogoWide" :alt="siteName" width="153" height="44" />
-                        </NuxtLink>
-                        <!-- End Logo -->
-
-                        <div class="header-search hs-expanded">
-                            <form action="#" class="input-wrapper" @submit.prevent="submitSearch">
-                                <div class="select-box">
-                                    <select v-model="searchCategory" name="cat" class="cat">
-                                        <option value="all-cat">All Categories</option>
-                                        <option v-for="category in categories" :key="category.slug || category.id"
-                                            :value="category.slug">
-                                            {{ category.name }}
-                                        </option>
-                                    </select>
-                                </div>
-                                <input v-model="searchInput" type="text" class="form-control" name="search"
-                                    autocomplete="off"
-                                    placeholder="Search..." required />
-                                <button class="btn btn-search" type="submit" title="submit-button">
-                                    <i class="d-icon-search"></i>
-                                </button>
-                            </form>
-                        </div>
-                        <!-- End Header Search -->
-                    </div>
-                    <div class="header-right">
-                        <div class="icon-box icon-box-side">
-                            <div class="icon-box-icon mr-0 mr-lg-2">
-                                <i class="d-icon-phone"></i>
-                            </div>
-                            <div class="icon-box-content d-lg-show">
-                                <h4 class="icon-box-title text-dark text-normal">
-                                    <a href="/cdn-cgi/l/email-protection#7002191f1415301d11191c5e131f1d"
-                                        class="text-primary d-inline-block">Live chat</a>
-                                    or:
-                                </h4>
-                                <p><a href="tel:#">0(800) 123-456</a></p>
-                            </div>
-                        </div>
-                        <span class="divider mr-4"></span>
-                        <div class="dropdown compare-dropdown off-canvas mr-xl-7 mr-4">
-                            <a href="#" class="compare compare-toggle mr-0" title="compare">
-                                <i class="d-icon-compare"></i>
-                            </a>
-                            <div class="canvas-overlay"></div>
-                            <!-- End Compare Toggle -->
-                            <div class="dropdown-box scrollable">
-                                <div class="canvas-header">
-                                    <h4 class="canvas-title">Compare</h4>
-                                    <a href="#" class="btn btn-dark btn-link btn-icon-right btn-close">close<i
-                                            class="d-icon-arrow-right"></i><span class="sr-only">Compare</span></a>
-                                </div>
-                                <div class="products scrollable">
-                                    <div class="product product-compare">
-                                        <figure class="product-media">
-                                            <NuxtLink to="/product">
-                                                <img src="/images/compare/product-1.jpg" alt="product" width="80"
-                                                    height="88" />
-                                            </NuxtLink>
-                                            <button class="btn btn-link btn-close">
-                                                <i class="fas fa-times"></i><span class="sr-only">Close</span>
-                                            </button>
-                                        </figure>
-                                        <div class="product-detail">
-                                            <NuxtLink to="/product" class="product-name">Riode White Trends</NuxtLink>
-                                            <div class="price-box">
-                                                <span class="product-price">$21.00
-                                                    <del class="old-price pl-1">$40.00</del>
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <!-- End of Compare Product -->
-                                    <div class="product product-compare">
-                                        <figure class="product-media">
-                                            <NuxtLink to="/product">
-                                                <img src="/images/compare/product-2.jpg" alt="product" width="80"
-                                                    height="88" />
-                                            </NuxtLink>
-                                            <button class="btn btn-link btn-close">
-                                                <i class="fas fa-times"></i><span class="sr-only">Close</span>
-                                            </button>
-                                        </figure>
-                                        <div class="product-detail">
-                                            <NuxtLink to="/product" class="product-name">Dark Blue Women?s
-                                                Leomora Hat</NuxtLink>
-                                            <div class="price-box">
-                                                <span class="product-price">$118.00
-                                                    <del class="old-price pl-1">$158.99</del>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End of Compare Product -->
-                                </div>
-                                <NuxtLink to="/compare" class="btn btn-dark compare-btn mt-4"><span>Go To Compare
-                                        List</span></NuxtLink>
-                                <!-- End of Products  -->
-                            </div>
-                            <!-- End Dropdown Box -->
-                        </div>
-                        <div class="dropdown wishlist wishlist-dropdown off-canvas">
-                            <NuxtLink to="/wishlist" class="wishlist-toggle" title="wishlist">
-                                <i class="d-icon-heart"></i>
-                            </NuxtLink>
-                            <div class="canvas-overlay"></div>
-                            <!-- End Wishlist Toggle -->
-                            <div class="dropdown-box scrollable">
-                                <div class="canvas-header">
-                                    <h4 class="canvas-title">wishlist</h4>
-                                    <a href="#" class="btn btn-dark btn-link btn-icon-right btn-close">close<i
-                                            class="d-icon-arrow-right"></i><span class="sr-only">wishlist</span></a>
-                                </div>
-                                <div class="products scrollable">
-                                    <div class="product product-wishlist">
-                                        <figure class="product-media">
-                                            <NuxtLink to="/product">
-                                                <img src="/images/wishlist/product-1.jpg" width="100" height="100"
-                                                    alt="product" />
-                                            </NuxtLink>
-                                            <button class="btn btn-link btn-close">
-                                                <i class="fas fa-times"></i><span class="sr-only">Close</span>
-                                            </button>
-                                        </figure>
-                                        <div class="product-detail">
-                                            <NuxtLink to="/product" class="product-name">Girl's Dark Bag</NuxtLink>
-                                            <div class="price-box">
-                                                <span class="product-price">$84.00</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End of wishlist Product -->
-                                    <div class="product product-wishlist">
-                                        <figure class="product-media">
-                                            <NuxtLink to="/product">
-                                                <img src="/images/wishlist/product-2.jpg" width="100" height="100"
-                                                    alt="product" />
-                                            </NuxtLink>
-                                            <button class="btn btn-link btn-close">
-                                                <i class="fas fa-times"></i><span class="sr-only">Close</span>
-                                            </button>
-                                        </figure>
-                                        <div class="product-detail">
-                                            <NuxtLink to="/product" class="product-name">Women's Fashional Comforter
-                                            </NuxtLink>
-                                            <div class="price-box">
-                                                <span class="product-price">$84.00</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End of wishlist Product -->
-                                    <div class="product product-wishlist">
-                                        <figure class="product-media">
-                                            <NuxtLink to="/product">
-                                                <img src="/images/wishlist/product-3.jpg" width="100" height="100"
-                                                    alt="product" />
-                                            </NuxtLink>
-                                            <button class="btn btn-link btn-close">
-                                                <i class="fas fa-times"></i><span class="sr-only">Close</span>
-                                            </button>
-                                        </figure>
-                                        <div class="product-detail">
-                                            <NuxtLink to="/product" class="product-name">Wide Knickerbockers</NuxtLink>
-                                            <div class="price-box">
-                                                <span class="product-price">$84.00</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- End of wishlist Product -->
-                                </div>
-                                <NuxtLink to="/wishlist" class="btn btn-dark wishlist-btn mt-4"><span>Go To
-                                        Wishlist</span></NuxtLink>
-                                <!-- End of Products  -->
-                            </div>
-                            <!-- End Dropdown Box -->
-                        </div>
-                        <span class="divider"></span>
-                        <div class="dropdown cart-dropdown type2 off-canvas mr-0 mr-lg-2">
-                            <a href="#" class="cart-toggle label-block link">
-                                <div class="cart-label d-lg-show">
-                                    <span class="cart-name">Shopping Cart:</span>
-                                    <span class="cart-price">{{ formatPrice(cartSubtotal) }}</span>
-                                </div>
-                                <i class="d-icon-bag"><span class="cart-count">{{ cartCount }}</span></i>
-                            </a>
-                            <div class="canvas-overlay"></div>
-                            <!-- End Cart Toggle -->
-                            <div class="dropdown-box">
-                                <div class="canvas-header">
-                                    <h4 class="canvas-title">Shopping Cart</h4>
-                                    <a href="#" class="btn btn-dark btn-link btn-icon-right btn-close">close<i
-                                            class="d-icon-arrow-right"></i><span class="sr-only">Cart</span></a>
-                                </div>
-                                <div class="products scrollable">
-                                    <div v-if="!cart.length" class="text-center text-muted py-4">
-                                        Your cart is empty.
-                                    </div>
-                                    <div v-for="item in cart" :key="item.id" class="product product-cart">
-                                        <figure class="product-media">
-                                            <NuxtLink :to="item.href || `/product/${item.slug}`">
-                                                <img :src="item.image" :alt="item.name" width="80"
-                                                    height="88" />
-                                            </NuxtLink>
-                                            <button class="btn btn-link btn-close" @click.prevent="removeItem(item.id)">
-                                                <i class="fas fa-times"></i><span class="sr-only">Close</span>
-                                            </button>
-                                        </figure>
-                                        <div class="product-detail">
-                                            <NuxtLink :to="item.href || `/product/${item.slug}`" class="product-name">{{ item.name }}</NuxtLink>
-                                            <div class="price-box">
-                                                <span class="product-quantity">{{ item.qty }}</span>
-                                                <span class="product-price">{{ formatPrice(item.price) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-</div>
-                                <!-- End of Products  -->
-                                <div class="cart-total">
-                                    <label>Subtotal:</label>
-                                    <span class="price">{{ formatPrice(cartSubtotal) }}</span>
-                                </div>
-                                <!-- End of Cart Total -->
-                                <div class="cart-action">
-                                    <NuxtLink to="/cart" class="btn btn-dark btn-link">View Cart</NuxtLink>
-                                    <NuxtLink to="/checkout" class="btn btn-dark"><span>Go To Checkout</span></NuxtLink>
-                                </div>
-                                <!-- End of Cart Action -->
-                            </div>
-                            <!-- End Dropdown Box -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="header-bottom">
-                <div class="container">
-                    <nav class="menu category-menu">
-                        <div v-for="item in categoryMenuItems" :key="item.key" class="category category-icon">
-                            <NuxtLink :to="categoryLink(item)">
-                                <figure class="categroy-media">
-                                    <img v-if="item.iconUrl" :src="item.iconUrl" :alt="item.name" width="32" height="32"
-                                        style="width: 2.2rem; height: 2.2rem; object-fit: contain;" />
-                                    <i v-else :class="item.icon"></i>
-                                </figure>
-                                <div class="category-content">
-                                    <h4 class="category-name">{{ item.name }}</h4>
-                                </div>
-                            </NuxtLink>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        </header>
-        <!-- End Header -->
-
-        <main class="main">
-            <section class="intro-section">
+   <main class="main">
+            <section class="intro-section mt-1">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-9 mb-4">
-                            <div class="owl-carousel owl-theme owl-dot-inner row gutter-no cols-1 animation-slider"
+                            <div style="" class="owl-carousel owl-theme owl-dot-inner row gutter-no cols-1 animation-slider"
                                 data-owl-options="{
                                 'nav': false,
                                 'dots': true,
-                                'autoplay': false,
+                                'autoplay': true,
+                                'autoplayTimeout': 4000,
+                                'autoplayHoverPause': true,
                                 'items': 1
                             }">
-                                <div class="banner banner-fixed content-middle intro-slide intro-slide1 banner-radius">
+                                <div
+                                    v-for="(slide, index) in heroSlides"
+                                    :key="slide.id || `hero-${index}`"
+                                    :class="[
+                                        'banner',
+                                        'banner-fixed',
+                                        'content-middle',
+                                        'intro-slide',
+                                        `intro-slide${index + 1}`,
+                                        'banner-radius'
+                                    ]"
+                                >
                                     <figure>
-                                        <img src="/images/demos/demo-market1/slides/1.jpg" alt="Banner" width="1030"
-                                            height="450" style="background-color: #fefefe;" />
+                                        <img 
+                                            :src="slide.image_url"
+                                            :alt="slide.title || 'Banner'"
+                                            width="1030"
+                                            height="450"
+                                        />
                                     </figure>
-                                    <div class="banner-content">
+                                    <div  class="banner-content" :class="bannerContentClass(slide)">
                                         <div class="slide-animate" data-animation-options="{
                                             'name': 'fadeInLeftShorter', 'duration': '1s'
                                         }">
-                                            <h5 class="banner-subtitle text-capitalize font-weight-normal">Lifestyle
-                                                Collection</h5>
-                                            <h3 class="banner-title text-uppercase font-weight-bold ls-m">for Ski
-                                                Clothes</h3>
-                                            <div
-                                                class="banner-price-info font-weight-semi-bold text-body text-uppercase ls-m">
-                                                Sale Up To <span class="text-primary">30% Off</span>
-                                            </div>
-                                            <NuxtLink to="/market-shop" class="btn btn-dark btn-outline btn-rounded">
-                                                Shop Now<i class="d-icon-arrow-right"></i></NuxtLink>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="banner banner-fixed content-middle intro-slide intro-slide2 banner-radius">
-                                    <figure>
-                                        <img src="/images/demos/demo-market1/slides/2.jpg" alt="Banner" width="1030"
-                                            height="450" style="background-color: #e2e2e3;" />
-                                    </figure>
-                                    <div class="banner-content text-right">
-                                        <div class="slide-animate" data-animation-options="{
-                                            'name': 'fadeInRightShorter', 'duration': '1s'
-                                        }">
-                                            <h5 class="banner-subtitle text-capitalize font-weight-normal">Find Your
-                                                Trending</h5>
-                                            <h3 class="banner-title text-uppercase font-weight-bold ls-m">Autumn style
+                                            <h5 v-if="slide.subtitle" class="banner-subtitle text-capitalize font-weight-normal">
+                                                {{ slide.subtitle }}
+                                            </h5>
+                                            <h3 v-if="slide.title" class="banner-title text-uppercase font-weight-bold ls-m">
+                                                {{ slide.title }}
                                             </h3>
-                                            <div
-                                                class="banner-price-info font-weight-semi-bold text-dark text-uppercase ls-m">
-                                                Get Up To <span class="text-primary">20% Off</span>
-                                            </div>
-                                            <p class="text-dark font-weight-normal">* Only until the end of this week
-                                            </p>
-                                            <NuxtLink to="/market-shop" class="btn btn-dark btn-outline btn-rounded">
-                                                Shop Now<i class="d-icon-arrow-right"></i></NuxtLink>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="banner banner-fixed content-middle intro-slide intro-slide3 banner-radius">
-                                    <figure>
-                                        <img src="/images/demos/demo-market1/slides/3.jpg" alt="Banner" width="1030"
-                                            height="450" style="background-color: #d8dee4;" />
-                                    </figure>
-                                    <div class="banner-content">
-                                        <div class="slide-animate" data-animation-options="{
-                                            'name': 'fadeInLeftShorter', 'duration': '1s'
-                                        }">
-                                            <h5 class="banner-subtitle text-capitalize font-weight-normal mb-1">
-                                                Must-Haves</h5>
-                                            <h3 class="banner-title text-uppercase font-weight-bold ls-m">for the season
-                                            </h3>
-                                            <div
-                                                class="banner-price-info font-weight-semi-bold text-dark text-uppercase ls-m">
-                                                Start At <span class="text-primary">$230.00</span>
-                                            </div>
-                                            <p class="text-dark font-weight-normal">* Get Plus Discount Buying Fashion
-                                            </p>
-                                            <NuxtLink to="/market-shop" class="btn btn-dark btn-outline btn-rounded">
-                                                Shop Now<i class="d-icon-arrow-right"></i></NuxtLink>
+                                            <NuxtLink :to="slide.cta_link || '/market-shop'" class="btn btn-dark btn-outline btn-rounded">
+                                                {{ slide.cta_text || 'Shop Now' }}<i class="d-icon-arrow-right"></i>
+                                            </NuxtLink>
                                         </div>
                                     </div>
                                 </div>
@@ -395,15 +56,26 @@
                                 <div class="intro-banner mb-4">
                                     <div class="banner banner-fixed content-middle banner-radius overlay-zoom">
                                         <figure>
-                                            <img src="/images/demos/demo-market1/banner/1.jpg" alt="Intro Banner"
-                                                width="330" height="215" style="background-color: #232323;" />
+                                            <img
+                                                :src="featuredCategory?.image_url || '/images/demos/demo-market1/banner/1.jpg'"
+                                                :alt="featuredCategory?.name || 'Intro Banner'"
+                                                width="330"
+                                                height="215"
+                                                style="background-color: #232323;"
+                                            />
                                         </figure>
                                         <div class="banner-content">
-                                            <h3 class="banner-title font-weight-bold text-white ls-m">Electronics</h3>
-                                            <div class="product-count text-uppercase text-white font-weight-semi-bold">6
-                                                Products</div>
+                                            <h3 class="banner-title font-weight-bold text-white ls-m">
+                                                {{ featuredCategory?.name || 'Electronics' }}
+                                            </h3>
+                                            <div class="product-count text-uppercase text-white font-weight-semi-bold">
+                                                {{ Number(featuredCategory?.product_count || 6) }} Products
+                                            </div>
                                             <span class="divider bg-white"></span>
-                                            <NuxtLink to="/market-shop" class="btn btn-white btn-link btn-underline ls-m">
+                                            <NuxtLink
+                                                :to="featuredCategory?.slug ? `/market-shop?category=${featuredCategory.slug}` : '/market-shop'"
+                                                class="btn btn-white btn-link btn-underline ls-m"
+                                            >
                                                 Shop Now<i class="d-icon-arrow-right"></i></NuxtLink>
                                         </div>
                                     </div>
@@ -411,15 +83,26 @@
                                 <div class="intro-banner mb-4">
                                     <div class="banner banner-fixed content-middle banner-radius overlay-zoom">
                                         <figure>
-                                            <img src="/images/demos/demo-market1/banner/2.jpg" alt="Intro Banner"
-                                                width="330" height="215" style="background-color: #eca5a9;" />
+                                            <img
+                                                :src="topSubcategory?.image_url || '/images/demos/demo-market1/banner/2.jpg'"
+                                                :alt="topSubcategory?.name || 'Intro Banner'"
+                                                width="330"
+                                                height="215"
+                                                style="background-color: #eca5a9;"
+                                            />
                                         </figure>
                                         <div class="banner-content">
-                                            <h3 class="banner-title font-weight-bold text-white ls-m">Accessories</h3>
-                                            <div class="product-count text-uppercase text-white font-weight-semi-bold">3
-                                                Products</div>
+                                            <h3 class="banner-title font-weight-bold text-white ls-m">
+                                                {{ topSubcategory?.name || 'Accessories' }}
+                                            </h3>
+                                            <div class="product-count text-uppercase text-white font-weight-semi-bold">
+                                                {{ Number(topSubcategory?.product_count || 3) }} Products
+                                            </div>
                                             <span class="divider bg-white"></span>
-                                            <NuxtLink to="/market-shop" class="btn btn-white btn-link btn-underline ls-m">
+                                            <NuxtLink
+                                                :to="topSubcategory?.slug ? `/market-shop?subcategory=${topSubcategory.slug}` : '/market-shop'"
+                                                class="btn btn-white btn-link btn-underline ls-m"
+                                            >
                                                 Shop Now<i class="d-icon-arrow-right"></i></NuxtLink>
                                         </div>
                                     </div>
@@ -1302,680 +985,6 @@
             </section>
 
         </main>
-        <!-- End Main -->
-
-        <footer class="footer">
-            <div class="container">
-                <div class="footer-top">
-                    <div class="row align-items-center">
-                        <div class="col-lg-3">
-                            <NuxtLink to="/" class="logo-footer">
-                                <img :src="siteLogoWide" :alt="siteName" width="153" height="44" />
-                            </NuxtLink>
-                            <!-- End FooterLogo -->
-                        </div>
-                        <div class="col-lg-4 widget-newsletter mb-4 mb-lg-0">
-                            <h4 class="widget-title ls-m">Subscribe to our Newsletter</h4>
-                            <p>Get all the latest information on Events, Sales and Offers.</p>
-                        </div>
-                        <div class="col-lg-5 widget-newsletter">
-                            <form action="#" class="input-wrapper-inline mx-auto mx-lg-0">
-                                <input type="email" class="form-control" name="email" id="email"
-                                    placeholder="Email address here..." required />
-                                <button class="btn btn-primary btn-rounded ml-2" type="submit">subscribe<i
-                                        class="d-icon-arrow-right"></i></button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <!-- End FooterTop -->
-                <div class="footer-middle">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-6">
-                            <div class="widget widget-info">
-                                <h4 class="widget-title">Contact Info</h4>
-                                <ul class="widget-body">
-                                    <li>
-                                        <label>Phone:</label>
-                                        <a href="tel:#">Toll Free (123) 456-7890</a>
-                                    </li>
-                                    <li>
-                                        <label>Email:</label>
-                                        <a href="/cdn-cgi/l/email-protection#bfd2ded6d3ffcdd6d0dbda91dcd0d2"><span
-                                                class="__cf_email__"
-                                                data-cfemail="c8baa1a7acad88a5a9a1a4e6aba7a5">[email&#160;protected]</span></a>
-                                    </li>
-                                    <li>
-                                        <label>Address:</label>
-                                        <a href="#">123 Street, City, Country</a>
-                                    </li>
-                                    <li>
-                                        <label>WORKING DAYS / HOURS:</label>
-                                    </li>
-                                    <li>
-                                        <a href="#">Mon - Sun / 9:00 AM - 8:00 PM</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!-- End Widget -->
-                        </div>
-                        <div class="col-lg-2 col-md-6">
-                            <div class="widget">
-                                <h4 class="widget-title">My Account</h4>
-                                <ul class="widget-body">
-                                    <li>
-                                        <NuxtLink to="/about-us">Track My Order</NuxtLink>
-                                    </li>
-                                    <li>
-                                        <a href="#">View Cart</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Sign in</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">My Wishlist</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Privacy Policy</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!-- End Widget -->
-                        </div>
-                        <div class="col-lg-2 col-md-6">
-                            <div class="widget">
-                                <h4 class="widget-title">About Us</h4>
-                                <ul class="widget-body">
-                                    <li>
-                                        <NuxtLink to="/about-us">About Us</NuxtLink>
-                                    </li>
-                                    <li>
-                                        <a href="#">Order History</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Returns</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Custom Service</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Terms &amp; Condition</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!-- End Widget -->
-                        </div>
-                        <div class="col-lg-2 col-md-6">
-                            <div class="widget">
-                                <h4 class="widget-title">Customer Service</h4>
-                                <ul class="widget-body">
-                                    <li>
-                                        <a href="#">Payment Methods</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Money-back Guarantee!</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Products Returns</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Support Center</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Shipping</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!-- End Widget -->
-                        </div>
-                        <div class="col-lg-3 col-md-6">
-                            <div class="widget widget-instagram pl-lg-10 mb-0 mb-md-6">
-                                <h4 class="widget-title">Instagram</h4>
-                                <figure class="widget-body row">
-                                    <div class="col-3">
-                                        <img src="/images/instagram/01.jpg" alt="instagram 1" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/02.jpg" alt="instagram 2" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/03.jpg" alt="instagram 3" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/04.jpg" alt="instagram 4" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/05.jpg" alt="instagram 5" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/06.jpg" alt="instagram 6" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/07.jpg" alt="instagram 7" width="64" height="64" />
-                                    </div>
-                                    <div class="col-3">
-                                        <img src="/images/instagram/08.jpg" alt="instagram 8" width="64" height="64" />
-                                    </div>
-                                </figure>
-                            </div>
-                            <!-- End Instagram -->
-                        </div>
-                    </div>
-                </div>
-                <!-- End FooterMiddle -->
-                <div class="footer-main">
-                    <div class="widget widget-category">
-                        <div v-for="category in footerCategories" :key="category.key" class="category-box">
-                            <h6 class="category-name">{{ category.name }}:</h6>
-                            <a v-for="subcategory in category.subcategories" :key="subcategory.slug || subcategory.id"
-                                href="#">
-                                {{ subcategory.name }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="footer-bottom">
-                    <div class="footer-left">
-                        <figure class="payment">
-                            <img src="/images/payment.png" alt="payment" width="159" height="29" />
-                        </figure>
-                    </div>
-                    <div class="footer-center">
-                        <p class="copyright">{{ siteName }} eCommerce &copy; 2021. All Rights Reserved</p>
-                    </div>
-                    <div class="footer-right">
-                        <div class="social-links">
-                            <a href="#" title="social-link" class="social-link social-facebook fab fa-facebook-f"></a>
-                            <a href="#" title="social-link" class="social-link social-twitter fab fa-twitter"></a>
-                            <a href="#" title="social-link" class="social-link social-linkedin fab fa-linkedin-in"></a>
-                        </div>
-                    </div>
-                </div>
-                <!-- End FooterBottom -->
-            </div>
-        </footer>
-        <!-- End Footer -->
-    </div>
-    <!-- Sticky Footer -->
-    <div class="sticky-footer sticky-content fix-bottom">
-        <NuxtLink to="/" class="sticky-link">
-            <i class="d-icon-home"></i>
-            <span>Home</span>
-        </NuxtLink>
-        <NuxtLink to="/market-shop" class="sticky-link">
-            <i class="d-icon-volume"></i>
-            <span>Categories</span>
-        </NuxtLink>
-        <NuxtLink to="/wishlist" class="sticky-link">
-            <i class="d-icon-heart"></i>
-            <span>Wishlist</span>
-        </NuxtLink>
-        <NuxtLink to="/account" class="sticky-link">
-            <i class="d-icon-user"></i>
-            <span>Account</span>
-        </NuxtLink>
-        <div class="header-search hs-toggle dir-up">
-            <a href="#" class="search-toggle sticky-link">
-                <i class="d-icon-search"></i>
-                <span>Search</span>
-            </a>
-            <form action="#" class="input-wrapper" @submit.prevent="submitSearch">
-                <input v-model="searchInput" type="text" class="form-control" name="search" autocomplete="off"
-                    placeholder="Search your keyword..." required />
-                <button class="btn btn-search" type="submit" title="submit-button">
-                    <i class="d-icon-search"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-    <!-- Scroll Top -->
-    <a id="scroll-top" href="#top" title="Top" role="button" class="scroll-top"><i class="d-icon-arrow-up"></i></a>
-
-    <!-- MobileMenu -->
-    <div class="mobile-menu-wrapper">
-        <div class="mobile-menu-overlay">
-        </div>
-        <!-- End of Overlay -->
-        <a class="mobile-menu-close" href="#"><i class="d-icon-times"></i></a>
-        <!-- End of CloseButton -->
-        <div class="mobile-menu-container scrollable">
-            <form action="#" class="input-wrapper" @submit.prevent="submitSearch">
-                <input v-model="searchInput" type="text" class="form-control" name="search" autocomplete="off"
-                    placeholder="Search your keyword..." required />
-                <button class="btn btn-search" type="submit" title="submit-button">
-                    <i class="d-icon-search"></i>
-                </button>
-            </form>
-            <!-- End of Search Form -->
-            <ul class="mobile-menu mmenu-anim">
-                <li>
-                    <NuxtLink to="/">Home</NuxtLink>
-                </li>
-                <li>
-                    <NuxtLink to="/market-shop">Categories</NuxtLink>
-                    <ul>
-                        <li>
-                            <a href="#">
-                                Variations 1
-                            </a>
-                            <ul>
-                                <li><a href="#">Classic Filter</a></li>
-                                <li><a href="#">Left Toggle Filter</a></li>
-                                <li><a href="#">Right Toggle Sidebar</a></li>
-                                <li><a href="#">Horizontal Filter </a>
-                                </li>
-                                <li><a href="#">Navigation Filter</a></li>
-
-                                <li><a href="#">Off-Canvas Filter </a></li>
-                                <li><a href="#">Top Banner</a></li>
-                                <li><a href="#">Inner Top Banner</a></li>
-                                <li><a href="#">With Bottom Block</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Variations 2
-                            </a>
-                            <ul>
-                                <li><a href="#">3 Columns Mode</a></li>
-                                <li><a href="#">4 Columns Mode</a></li>
-                                <li><a href="#">5 Columns Mode</a></li>
-                                <li><a href="#">6 Columns Mode</a></li>
-                                <li><a href="#">7 Columns Mode</a></li>
-                                <li><a href="#">8 Columns Mode</a></li>
-                                <li><a href="#">List Mode</a></li>
-                                <li><a href="#">Pagination</a></li>
-                                <li><a href="#">Infinite Ajaxscroll </a></li>
-                                <li><a href="#">Loadmore Button</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">
-                                Variations 3
-                            </a>
-                            <ul>
-                                <li><a href="#">Category Grid Shop</a></li>
-                                <li><a href="#">Category + Products</a></li>
-                                <li><a href="#">Shop Default 1 </a>
-                                </li>
-                                <li><a href="#">Shop Default 2</a></li>
-                                <li><a href="#">Shop Default 3</a></li>
-                                <li><a href="#">Shop Default 4</a></li>
-                                <li><a href="#">Shop Default 5</a></li>
-                                <li><a href="#">Shop Default 6</a></li>
-                                <li><a href="#">Shop Default 7</a></li>
-                                <li><a href="#">Shop Default 8</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">Products</a>
-                    <ul>
-                        <li>
-                            <a href="#">Product Pages</a>
-                            <ul>
-                                <li><a href="#">Simple Product</a></li>
-                                <li><a href="#">Featured &amp; On Sale</a></li>
-                                <li><NuxtLink to="/product">Variable Product</NuxtLink></li>
-                                <li><a href="#">Variation Swatch
-                                        Product</a></li>
-                                <li><a href="#">Grouped Product </a></li>
-                                <li><a href="#">External Product</a></li>
-                                <li><a href="#">In Stock Product</a></li>
-                                <li><a href="#">Out of Stock Product</a></li>
-                                <li><a href="#">Upsell Products</a></li>
-                                <li><a href="#">Cross Sell Products</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Product Layouts</a>
-                            <ul>
-                                <li><a href="#">Vertical Thumb</a></li>
-                                <li><a href="#">Horizontal Thumb</a></li>
-                                <li><a href="#">Gallery Type</a></li>
-                                <li><a href="#">Grid Images</a></li>
-                                <li><a href="#">Masonry Images</a></li>
-                                <li><a href="#">Sticky Info</a></li>
-                                <li><a href="#">Left & Right Sticky</a></li>
-                                <li><a href="#">With Left Sidebar</a></li>
-                                <li><a href="#">With Right Sidebar</a></li>
-                                <li><a href="#">Full Width Layout </a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Product Features</a>
-                            <ul>
-                                <li><a href="#">Sale Countdown</a></li>
-                                <li><a href="#">Hurry Up Notification </a></li>
-                                <li><a href="#">Attribute Guide </a></li>
-                                <li><a href="#">Add Cart Sticky</a></li>
-                                <li><a href="#">Labels on Thumbnail</a>
-                                </li>
-                                <li><a href="#">More Description
-                                        Tabs</a></li>
-                                <li><a href="#">Data In Accordion</a></li>
-                                <li><a href="#">Data Inside</a></li>
-                                <li><a href="#">Video Thumbnail </a>
-                                </li>
-                                <li><a href="#">360 Degree Thumbnail </a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">Pages</a>
-                    <ul>
-                        <li><NuxtLink to="/about-us">About</NuxtLink></li>
-                        <li><NuxtLink to="/contact-us">Contact Us</NuxtLink></li>
-                        <li><NuxtLink to="/account">Login</NuxtLink></li>
-                        <li><NuxtLink to="/faq">FAQs</NuxtLink></li>
-                        <li><NuxtLink to="/error-404">Error 404</NuxtLink>
-                            <ul>
-                                <li><NuxtLink to="/error-404">Error 404-1</NuxtLink></li>
-                                <li><a href="#">Error 404-2</a></li>
-                                <li><a href="#">Error 404-3</a></li>
-                                <li><a href="#">Error 404-4</a></li>
-                            </ul>
-                        </li>
-                        <li><NuxtLink to="/coming-soon">Coming Soon</NuxtLink></li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">Blog</a>
-                    <ul>
-                        <li><a href="#">Classic</a></li>
-                        <li><a href="#">Listing</a></li>
-                        <li>
-                            <a href="#">Grid</a>
-                            <ul>
-                                <li><a href="#">Grid 2 columns</a></li>
-                                <li><a href="#">Grid 3 columns</a></li>
-                                <li><a href="#">Grid 4 columns</a></li>
-                                <li><a href="#">Grid sidebar</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Masonry</a>
-                            <ul>
-                                <li><a href="#">Masonry 2 columns</a></li>
-                                <li><a href="#">Masonry 3 columns</a></li>
-                                <li><a href="#">Masonry 4 columns</a></li>
-                                <li><a href="#">Masonry sidebar</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Mask</a>
-                            <ul>
-                                <li><a href="#">Blog mask grid</a></li>
-                                <li><a href="#">Blog mask masonry</a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Single Post</a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="#">Elements</a>
-                    <ul>
-                        <li>
-                            <a href="#">Elements 1</a>
-                            <ul>
-                                <li><a href="#">Accordions</a></li>
-                                <li><a href="#">Alert &amp; Notification</a></li>
-
-                                <li><a href="#">Banner Effect
-
-                                    </a></li>
-                                <li><a href="#">Banner
-                                    </a></li>
-                                <li><a href="#">Blog Posts</a></li>
-                                <li><a href="#">Breadcrumb
-                                    </a></li>
-                                <li><a href="#">Buttons</a></li>
-                                <li><a href="#">Call to Action</a></li>
-                                <li><a href="#">Countdown
-                                    </a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Elements 2</a>
-                            <ul>
-                                <li><a href="#">Counter </a></li>
-                                <li><a href="#">Creative Grid
-
-                                    </a></li>
-                                <li><a href="#">Entrance Effect
-
-                                    </a></li>
-                                <li><a href="#">Floating
-
-                                    </a></li>
-                                <li><a href="#">Hotspot
-
-                                    </a></li>
-                                <li><a href="#">Icon Boxes</a></li>
-                                <li><a href="#">Icons</a></li>
-                                <li><a href="#">Image box
-
-                                    </a></li>
-                                <li><a href="#">Instagrams</a></li>
-
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Elements 3</a>
-                            <ul>
-
-                                <li><a href="#">Product Category</a></li>
-                                <li><a href="#">Products</a></li>
-                                <li><a href="#">Products + Banner
-
-                                    </a></li>
-                                <li><a href="#">Products + Grid
-
-                                    </a></li>
-                                <li><a href="#">Product Single
-
-                                    </a>
-                                </li>
-                                <li><a href="#">Products + Tab
-
-                                    </a></li>
-                                <li><a href="#">Single Product
-
-                                    </a></li>
-                                <li><a href="#">Slider
-
-                                    </a></li>
-                                <li><a href="#">Social Icons </a></li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="#">Elements 4</a>
-                            <ul>
-                                <li><a href="#">Subcategory
-
-                                    </a></li>
-                                <li><a href="#">Svg Floating
-
-                                    </a></li>
-                                <li><a href="#">Tabs</a></li>
-                                <li><a href="#">Testimonials
-                                    </a></li>
-                                <li><a href="#">Title</a></li>
-                                <li><a href="#">Typography</a></li>
-                                <li><a href="#">Vendor
-
-                                    </a></li>
-                                <li><a href="#">Video
-
-                                    </a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li><a href="https://1.envato.market/DdLk5" rel="noreferrer">Buy {{ siteName }}!</a></li>
-            </ul>
-        </div>
-    </div>
-    <!-- newsletter-popup type5 -->
-    <div class="newsletter-popup newsletter-pop5 mfp-hide" id="newsletter-popup">
-        <figure>
-            <img src="/images/newsletter-popup5.png" width="500" height="570" alt="newsletter5" />
-        </figure>
-        <div class="newsletter-content p-absolute">
-            <h2 class="font-weight-semi-bold ls-m mb-2">Sign up to <span class="font-weight-bolder">RIODE</span></h2>
-            <p class="text-body">Get timely updates from your favorite products.</p>
-            <form action="#" method="get" class="input-wrapper input-wrapper-inline input-wrapper-round">
-                <input type="email" class="form-control email" name="email" id="email2"
-                    placeholder="Email address here..." required="">
-                <button class="btn btn-dark" type="submit">SUBMIT</button>
-            </form>
-            <div class="form-checkbox justify-content-center">
-                <input type="checkbox" class="custom-checkbox" id="hide-newsletter-popup" name="hide-newsletter-popup"
-                    required />
-                <label class="hide-newsletter-popup">Don't show this popup again</label>
-            </div>
-            <div class="social-links">
-                <a href="#" title="social-link" class="social-link social-linkedin fab fa-google"></a>
-                <a href="#" title="social-link" class="social-link social-facebook fab fa-facebook-f"></a>
-                <a href="#" title="social-link" class="social-link social-twitter fab fa-twitter"></a>
-            </div>
-        </div>
-    </div>
-
-    <!-- sticky icons-->
-    <div class="sticky-icons-wrapper">
-        <div class="sticky-icon-links">
-            <ul>
-                <li><a href="#" class="demo-toggle"><i class="fas fa-home"></i><span>Demos</span></a></li>
-                <li><a href="#"><i class="fas fa-info-circle"></i><span>Documentation</span></a>
-                </li>
-                <li><a href="https://themeforest.net/downloads/"><i class="fas fa-star"></i><span>Reviews</span></a>
-                </li>
-                <li><a href="https://d-themes.com/buynow/riodehtml"><i class="fas fa-shopping-cart"></i><span>Buy
-                            now!</span></a></li>
-            </ul>
-        </div>
-        <div class="demos-list">
-            <div class="demos-overlay"></div>
-            <a class="demos-close" href="#"><i class="close-icon"></i></a>
-            <div class="demos-content scrollable scrollable-light">
-                <h3 class="demos-title">Demos</h3>
-                <div class="demos">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- <div class="mfp-wrap mfp-close-btn-in mfp-auto-cursor mfp-login mfp-fade mfp-ready" tabindex="-1"
-        >
-        <div class="mfp-container mfp-ajax-holder">
-            <div class="mfp-content">
-                <div class="login-popup">
-                    <div class="form-box">
-                        <div class="tab tab-nav-simple tab-nav-boxed form-tab">
-                            <ul class="nav nav-tabs nav-fill align-items-center border-no justify-content-center mb-5"
-                                role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active border-no lh-1 ls-normal" href="#signin">Login</a>
-                                </li>
-                                <li class="delimiter">or</li>
-                                <li class="nav-item">
-                                    <a class="nav-link border-no lh-1 ls-normal" href="#register">Register</a>
-                                </li>
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane active" id="signin">
-                                    <form action="#">
-                                        <div class="form-group mb-3">
-                                            <input type="text" class="form-control" id="singin-email"
-                                                name="singin-email" placeholder="Username or Email Address *"
-                                                required="">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" class="form-control" id="singin-password"
-                                                name="singin-password" placeholder="Password *" required="">
-                                        </div>
-                                        <div class="form-footer">
-                                            <div class="form-checkbox">
-                                                <input type="checkbox" class="custom-checkbox" id="signin-remember"
-                                                    name="signin-remember">
-                                                <label class="form-control-label" for="signin-remember">Remember
-                                                    me</label>
-                                            </div>
-                                            <a href="#" class="lost-link">Lost your password?</a>
-                                        </div>
-                                        <button class="btn btn-dark btn-block btn-rounded" type="submit">Login</button>
-                                    </form>
-                                    <div class="form-choice text-center">
-                                        <label class="ls-m">or Login With</label>
-                                        <div class="social-links">
-                                            <a href="#" class="social-link social-google fab fa-google border-no"></a>
-                                            <a href="#"
-                                                class="social-link social-facebook fab fa-facebook-f border-no"></a>
-                                            <a href="#" class="social-link social-twitter fab fa-twitter border-no"></a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane" id="register">
-                                    <form action="#">
-                                        <div class="form-group mb-3">
-                                            <input type="email" class="form-control" id="register-email"
-                                                name="register-email" placeholder="Your Email Address *" required="">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="password" class="form-control" id="register-password"
-                                                name="register-password" placeholder="Password *" required="">
-                                        </div>
-                                        <div class="form-footer">
-                                            <div class="form-checkbox">
-                                                <input type="checkbox" class="custom-checkbox" id="register-agree"
-                                                    name="register-agree" required="">
-                                                <label class="form-control-label" for="register-agree">I agree to the
-                                                    privacy policy</label>
-                                            </div>
-                                        </div>
-                                        <button class="btn btn-dark btn-block btn-rounded"
-                                            type="submit">Register</button>
-                                    </form>
-                                    <div class="form-choice text-center">
-                                        <label class="ls-m">or Register With</label>
-                                        <div class="social-links">
-                                            <a href="#" class="social-link social-google fab fa-google border-no"></a>
-                                            <a href="#"
-                                                class="social-link social-facebook fab fa-facebook-f border-no"></a>
-                                            <a href="#" class="social-link social-twitter fab fa-twitter border-no"></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button title="Close (Esc)" type="button" class="mfp-close"><span>?</span></button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- Plugins JS File -->
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <!-- Main JS File -->
-    
-    
-
-  </div>
 </template>
 
 <script setup>
@@ -1984,6 +993,7 @@ const { cart, cartCount, cartSubtotal, addToCart, removeItem } = useCart()
 const { categories } = useCategories()
 const { vendors: topVendors } = useTopVendors(4)
 const { settings } = useSiteSettings()
+const config = useRuntimeConfig()
 const router = useRouter()
 const siteName = computed(() => settings.value.site_name || 'Riode')
 const siteLogoWide = computed(
@@ -1995,6 +1005,64 @@ const siteLogoWide = computed(
 
 const searchInput = ref('')
 const searchCategory = ref('all-cat')
+const homepageCache = useState('homepage-cache', () => null)
+
+const { data: homepageData } = useAsyncData(
+  'homepage',
+  async () => {
+    if (homepageCache.value) {
+      return homepageCache.value
+    }
+    const payload = await $fetch(`${config.public.apiBase}/homepage`)
+    homepageCache.value = payload
+    return payload
+  },
+  { lazy: true }
+)
+
+const defaultHeroSlides = [
+  {
+    image_url: '/images/demos/demo-market1/slides/1.jpg',
+    subtitle: 'Lifestyle Collection',
+    title: 'for Ski Clothes',
+    cta_text: 'Shop Now',
+    cta_link: '/market-shop',
+    text_align: 'left'
+  },
+  {
+    image_url: '/images/demos/demo-market1/slides/2.jpg',
+    subtitle: 'Find Your Trending',
+    title: 'Autumn style',
+    cta_text: 'Shop Now',
+    cta_link: '/market-shop',
+    text_align: 'right'
+  },
+  {
+    image_url: '/images/demos/demo-market1/slides/3.jpg',
+    subtitle: 'Must-Haves',
+    title: 'for the season',
+    cta_text: 'Shop Now',
+    cta_link: '/market-shop',
+    text_align: 'left'
+  }
+]
+
+const heroSlides = computed(() => {
+  const items = homepageData.value?.banners ?? []
+  return items.length ? items : defaultHeroSlides
+})
+
+const bannerContentClass = (banner) => {
+  if (!banner?.text_align) return ''
+  if (banner.text_align === 'center') return 'text-center'
+  if (banner.text_align === 'right') return 'text-right'
+  return ''
+}
+
+const featuredCategory = computed(() => homepageData.value?.featured_category || null)
+const topSubcategory = computed(
+  () => (homepageData.value?.top_selling_subcategories ?? [])[0] || null
+)
 
 const categoryMenuIcons = [
   'd-icon-desktop',
@@ -2096,8 +1164,13 @@ const recentProducts = computed(() => homeSections.value.recent)
 useHead({
   bodyAttrs: { class: 'home market' }
 })
-
+definePageMeta({
+  layout: 'riode',
+  requiresAuth: true
+})
 </script>
+
+
 
 
 
